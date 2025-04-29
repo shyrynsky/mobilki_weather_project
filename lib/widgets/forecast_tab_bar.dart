@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/weather_provider.dart';
 import '../models/weather_model.dart';
+import '../widgets/error_handler.dart';
 
 class ForecastTabBar extends StatelessWidget {
   const ForecastTabBar({super.key});
@@ -28,8 +29,30 @@ class DailyForecastTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<WeatherProvider>(
       builder: (context, weatherProvider, child) {
+        final error = weatherProvider.error;
+        
         if (weatherProvider.isLoading) {
           return const Center(child: CircularProgressIndicator());
+        }
+        
+        // Если есть ошибка, показываем ее через ErrorHandler
+        if (error != null) {
+          // Показываем ошибку как полноэкранное сообщение, если нет данных
+          if (weatherProvider.forecast.isEmpty) {
+            return ErrorHandler.buildFullScreenError(
+              error,
+              onRetry: () {
+                weatherProvider.clearError();
+                weatherProvider.fetchForecast(weatherProvider.currentCity);
+              },
+            );
+          } else {
+            // Если есть данные, но также есть ошибка, показываем ее через попап
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              ErrorHandler.showError(context, error);
+              weatherProvider.clearError();
+            });
+          }
         }
         
         if (weatherProvider.forecast.isEmpty) {
@@ -81,8 +104,18 @@ class Every6HoursForecastTab extends StatelessWidget {
     final periods = ['00:00', '06:00', '12:00', '18:00'];
     return Consumer<WeatherProvider>(
       builder: (context, weatherProvider, child) {
+        final error = weatherProvider.error;
+        
         if (weatherProvider.isLoading) {
           return const Center(child: CircularProgressIndicator());
+        }
+        
+        // Показываем ошибку, если она есть
+        if (error != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ErrorHandler.showError(context, error);
+            weatherProvider.clearError();
+          });
         }
         
         if (weatherProvider.forecast.isEmpty) {
@@ -124,8 +157,18 @@ class HourlyForecastTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<WeatherProvider>(
       builder: (context, weatherProvider, child) {
+        final error = weatherProvider.error;
+        
         if (weatherProvider.isLoading) {
           return const Center(child: CircularProgressIndicator());
+        }
+        
+        // Показываем ошибку, если она есть
+        if (error != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ErrorHandler.showError(context, error);
+            weatherProvider.clearError();
+          });
         }
         
         if (weatherProvider.forecast.isEmpty) {

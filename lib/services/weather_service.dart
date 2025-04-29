@@ -19,12 +19,13 @@ class WeatherService {
         final data = jsonDecode(response.body);
         return Weather.fromJson(data);
       } else {
-        print('Ошибка при запросе погоды: ${response.statusCode}');
-        return Weather.mock(); // Возвращаем замоканные данные в случае ошибки
+        final errorMsg = response.body.isNotEmpty 
+            ? jsonDecode(response.body)['error']['message'] ?? 'Ошибка API'
+            : 'Ошибка ${response.statusCode}';
+        throw Exception('Ошибка при запросе погоды: $errorMsg');
       }
     } catch (e) {
-      print('Исключение при запросе погоды: $e');
-      return Weather.mock(); // Возвращаем замоканные данные в случае исключения
+      throw Exception('Не удалось загрузить данные о погоде: $e');
     }
   }
   
@@ -41,13 +42,13 @@ class WeatherService {
         
         return forecastData.map((day) => Forecast.fromJson(day)).toList();
       } else {
-        print('Ошибка при запросе прогноза: ${response.statusCode}');
-        // Возвращаем пустой список в случае ошибки
-        return [];
+        final errorMsg = response.body.isNotEmpty 
+            ? jsonDecode(response.body)['error']['message'] ?? 'Ошибка API'
+            : 'Ошибка ${response.statusCode}';
+        throw Exception('Ошибка при запросе прогноза: $errorMsg');
       }
     } catch (e) {
-      print('Исключение при запросе прогноза: $e');
-      return []; // Возвращаем пустой список в случае исключения
+      throw Exception('Не удалось загрузить прогноз погоды: $e');
     }
   }
 } 

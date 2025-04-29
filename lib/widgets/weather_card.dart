@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../providers/weather_provider.dart';
+import '../widgets/error_handler.dart';
 
 class WeatherCard extends StatelessWidget {
   const WeatherCard({super.key});
@@ -12,13 +13,50 @@ class WeatherCard extends StatelessWidget {
       builder: (context, weatherProvider, child) {
         final weather = weatherProvider.currentWeather;
         final isLoading = weatherProvider.isLoading;
+        final error = weatherProvider.error;
         
         if (isLoading) {
           return _buildLoadingCard();
         }
         
+        // Отображаем ошибку если нет данных о погоде
         if (weather == null) {
-          return _buildErrorCard();
+          // Если есть ошибка, показываем ее через ErrorHandler
+          if (error != null) {
+            // Показываем сообщение об ошибке только один раз
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              ErrorHandler.showError(context, error);
+              // Очищаем ошибку после показа
+              weatherProvider.clearError();
+            });
+          }
+          
+          return Container(
+            decoration: BoxDecoration(
+              color: Colors.blue[100],
+              borderRadius: BorderRadius.circular(16),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
+            child: const Column(
+              children: [
+                Icon(Icons.cloud_off, size: 64, color: Colors.blueGrey),
+                SizedBox(height: 16),
+                Text(
+                  "Нет данных о погоде",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+          );
+        }
+        
+        // Если есть данные о погоде, но также есть ошибка, показываем ее через попап
+        if (error != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ErrorHandler.showError(context, error);
+            // Очищаем ошибку после показа
+            weatherProvider.clearError();
+          });
         }
         
         return Container(
@@ -69,26 +107,6 @@ class WeatherCard extends StatelessWidget {
           SizedBox(height: 16),
           Text(
             "Загрузка данных...",
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-          ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildErrorCard() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.red[100],
-        borderRadius: BorderRadius.circular(16),
-      ),
-      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
-      child: const Column(
-        children: [
-          Icon(Icons.error_outline, size: 64, color: Colors.red),
-          SizedBox(height: 16),
-          Text(
-            "Ошибка загрузки данных",
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
           ),
         ],

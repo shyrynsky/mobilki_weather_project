@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../screens/map_screen.dart';
 import '../providers/weather_provider.dart';
+import '../widgets/error_handler.dart';
 
 class LocationDrawer extends StatelessWidget {
   const LocationDrawer({super.key});
@@ -12,6 +13,16 @@ class LocationDrawer extends StatelessWidget {
       width: 300,
       child: Consumer<WeatherProvider>(
         builder: (context, weatherProvider, child) {
+          final error = weatherProvider.error;
+          
+          // Показываем ошибку как SnackBar, если она есть
+          if (error != null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              ErrorHandler.showError(context, error);
+              weatherProvider.clearError();
+            });
+          }
+          
           return ListView(
             padding: EdgeInsets.zero,
             children: [

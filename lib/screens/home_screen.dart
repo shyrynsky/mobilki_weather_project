@@ -5,6 +5,7 @@ import '../widgets/weather_card.dart';
 import '../widgets/drawer_menu.dart';
 import '../providers/weather_provider.dart';
 import '../models/weather_model.dart';
+import '../widgets/error_handler.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -40,6 +41,18 @@ class HomeScreen extends StatelessWidget {
         builder: (context, weatherProvider, child) {
           final weather = weatherProvider.currentWeather;
           final isLoading = weatherProvider.isLoading;
+          final error = weatherProvider.error;
+          
+          // Показываем ошибку через ErrorHandler, если полностью нет данных
+          if (error != null && weather == null) {
+            return ErrorHandler.buildFullScreenError(
+              error,
+              onRetry: () {
+                weatherProvider.clearError();
+                weatherProvider.refreshAllData();
+              },
+            );
+          }
           
           return Padding(
             padding: const EdgeInsets.all(16.0),

@@ -36,7 +36,8 @@ class WeatherProvider with ChangeNotifier {
       _currentCity = city;
       _error = null;
     } catch (e) {
-      _error = 'Не удалось загрузить данные о погоде: $e';
+      _error = e.toString();
+      // Оставляем предыдущие данные, если они есть
       print(_error);
     } finally {
       _isLoading = false;
@@ -47,13 +48,15 @@ class WeatherProvider with ChangeNotifier {
   // Метод для получения прогноза
   Future<void> fetchForecast(String city, {int days = 7}) async {
     _isLoading = true;
+    _error = null;
     notifyListeners();
     
     try {
       final forecastData = await _weatherService.getForecast(city, days: days);
       _forecast = forecastData;
     } catch (e) {
-      _error = 'Не удалось загрузить прогноз погоды: $e';
+      _error = e.toString();
+      // Оставляем предыдущий прогноз, если он есть
       print(_error);
     } finally {
       _isLoading = false;
@@ -63,6 +66,7 @@ class WeatherProvider with ChangeNotifier {
   
   // Метод для обновления всех данных
   Future<void> refreshAllData() async {
+    _error = null;
     await fetchWeatherData(_currentCity);
     await fetchForecast(_currentCity);
   }
@@ -73,5 +77,11 @@ class WeatherProvider with ChangeNotifier {
       _currentCity = newCity;
       refreshAllData();
     }
+  }
+  
+  // Сброс ошибки
+  void clearError() {
+    _error = null;
+    notifyListeners();
   }
 } 
