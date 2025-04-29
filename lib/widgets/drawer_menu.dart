@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../screens/units_settings_screen.dart';
+import '../main.dart';
 
 class DrawerMenu extends StatelessWidget {
   const DrawerMenu({super.key});
@@ -15,17 +16,20 @@ class DrawerMenu extends StatelessWidget {
             child: const Text('Меню', style: TextStyle(color: Colors.white, fontSize: 24)),
           ),
           ListTile(
-            leading: const Icon(Icons.person_outline),
-            title: const Text('Профиль'),
-            onTap: () {}, // Заглушка
-          ),
-          ListTile(
-            leading: const Icon(Icons.straighten),
-            title: const Text("Единицы измерения"), // Переименовано
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const UnitsSettingsScreen()),
-            ),
+            leading: const Icon(Icons.settings),
+            title: const Text("Настройки"),
+            onTap: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const UnitsSettingsScreen()),
+              );
+              
+              // Handle theme toggle result
+              if (result != null && result is bool) {
+                // Use the public accessor method to get the WeatherApp state
+                WeatherAppState.of(context)?.toggleTheme(result);
+              }
+            },
           ),
         ],
       ),

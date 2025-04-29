@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../providers/weather_provider.dart';
+import '../providers/settings_provider.dart';
 import '../widgets/error_handler.dart';
 
 class WeatherCard extends StatelessWidget {
@@ -11,6 +12,7 @@ class WeatherCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<WeatherProvider>(
       builder: (context, weatherProvider, child) {
+        final settingsProvider = Provider.of<SettingsProvider>(context);
         final weather = weatherProvider.currentWeather;
         final isLoading = weatherProvider.isLoading;
         final error = weatherProvider.error;
@@ -84,7 +86,7 @@ class WeatherCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                weather.temperatureString,
+                weather.getTemperatureString(settingsProvider),
                 style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
               ),
             ],

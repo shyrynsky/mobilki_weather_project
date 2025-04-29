@@ -4,10 +4,10 @@ import 'screens/home_screen.dart';
 import 'screens/forecast_screen.dart';
 import 'screens/ecology/air_screen.dart';
 import 'screens/map_screen.dart';
-import 'screens/settings_screen.dart';
 import 'widgets/drawer_menu.dart';
 import 'providers/weather_provider.dart';
 import 'providers/ecology_provider.dart';
+import 'providers/settings_provider.dart';
 
 void main() => runApp(const WeatherApp());
 
@@ -15,14 +15,19 @@ class WeatherApp extends StatefulWidget {
   const WeatherApp({super.key});
 
   @override
-  State<WeatherApp> createState() => _WeatherAppState();
+  State<WeatherApp> createState() => WeatherAppState();
 }
 
-class _WeatherAppState extends State<WeatherApp> {
+class WeatherAppState extends State<WeatherApp> {
   bool _isDarkMode = false;
 
-  void _toggleTheme(bool value) {
+  void toggleTheme(bool value) {
     setState(() => _isDarkMode = value);
+  }
+
+  // Add a public accessor method
+  static WeatherAppState? of(BuildContext context) {
+    return context.findAncestorStateOfType<WeatherAppState>();
   }
 
   @override
@@ -31,6 +36,7 @@ class _WeatherAppState extends State<WeatherApp> {
       providers: [
         ChangeNotifierProvider(create: (_) => WeatherProvider()),
         ChangeNotifierProvider(create: (_) => EcologyProvider()),
+        ChangeNotifierProvider(create: (_) => SettingsProvider()),
       ],
       child: MaterialApp(
         title: 'Погода+',
@@ -47,7 +53,7 @@ class _WeatherAppState extends State<WeatherApp> {
             brightness: Brightness.light,
           ),
         ),
-        home: MainNavigation(toggleTheme: _toggleTheme),
+        home: MainNavigation(toggleTheme: toggleTheme),
         debugShowCheckedModeBanner: false,
       ),
     );
@@ -60,19 +66,17 @@ class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key, required this.toggleTheme});
 
   @override
-  State<MainNavigation> createState() => _MainNavigationState();
+  State<MainNavigation> createState() => MainNavigationState();
 }
 
-class _MainNavigationState extends State<MainNavigation> {
+class MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
 
-  // Убраны const для SettingsScreen, так как колбэк не может быть константой
   late final List<Widget> _screens = [
     const HomeScreen(),
     const ForecastScreen(),
     const AirScreen(),
     const MapScreen(),
-    SettingsScreen(onThemeChanged: widget.toggleTheme), // Колбэк передаётся напрямую
   ];
 
   @override
@@ -86,7 +90,7 @@ class _MainNavigationState extends State<MainNavigation> {
   }
 
   String _getTitle(int index) {
-    const titles = ["Погода", "Прогноз", "Экология", "Карта", "Тема"];
+    const titles = ["Погода", "Прогноз", "Экология", "Карта"];
     return titles[index];
   }
 
@@ -101,23 +105,19 @@ class _MainNavigationState extends State<MainNavigation> {
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.cloud),
-          label: 'Погода', // Добавлена метка
+          label: 'Погода',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.calendar_today),
-          label: 'Прогноз', // Добавлена метка
+          label: 'Прогноз',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.eco),
-          label: 'Экология', // Добавлена метка
+          label: 'Экология',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.map),
-          label: 'Карта', // Добавлена метка
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.palette),
-          label: 'Тема', // Добавлена метка
+          label: 'Карта',
         ),
       ],
     );

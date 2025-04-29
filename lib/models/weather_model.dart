@@ -1,3 +1,5 @@
+import '../providers/settings_provider.dart';
+
 class Weather {
   final String cityName;
   final double temperature;
@@ -49,8 +51,15 @@ class Weather {
     );
   }
 
-  // Вспомогательные методы для форматирования данных
+  // Вспомогательные методы для форматирования данных с учетом единиц измерения
+  String getTemperatureString(SettingsProvider settings) {
+    final convertedTemp = settings.convertTemperature(temperature);
+    return '${convertedTemp.round()}${settings.temperatureUnit}';
+  }
+  
+  // Старый метод для обратной совместимости
   String get temperatureString => '${temperature.round()}°C';
+  
   String get humidityString => '$humidity%';
   String get pressureString => '${pressure.round()} мм';
   String get windSpeedString => '${windSpeed.round()} м/с';
@@ -93,6 +102,14 @@ class Forecast {
     );
   }
 
+  // Метод с учетом настроек
+  String getTempRangeString(SettingsProvider settings) {
+    final minTempConverted = settings.convertTemperature(minTemp).round();
+    final maxTempConverted = settings.convertTemperature(maxTemp).round();
+    return '$minTempConverted${settings.temperatureUnit}-$maxTempConverted${settings.temperatureUnit}';
+  }
+  
+  // Старый метод для обратной совместимости
   String get tempRangeString => '${minTemp.round()}°-${maxTemp.round()}°';
   
   // Получение прогноза для определенных часов (например, для 6-часового отображения)
@@ -140,7 +157,14 @@ class HourForecast {
       chanceOfRain: json['chance_of_rain'].toDouble(),
     );
   }
+  
+  // Метод с учетом настроек
+  String getTempString(SettingsProvider settings) {
+    final convertedTemp = settings.convertTemperature(temp).round();
+    return '$convertedTemp${settings.temperatureUnit}';
+  }
 
+  // Старые методы для обратной совместимости
   String get tempString => '${temp.round()}°C';
   String get windString => '${windSpeed.round()} м/с';
   String get hourString => '$hour:00';

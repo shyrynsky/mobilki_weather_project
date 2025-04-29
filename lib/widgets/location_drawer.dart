@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../screens/map_screen.dart';
 import '../providers/weather_provider.dart';
+import '../providers/settings_provider.dart';
 import '../widgets/error_handler.dart';
 
 class LocationDrawer extends StatelessWidget {
@@ -58,9 +59,10 @@ class LocationDrawer extends StatelessWidget {
   }
 
   Widget _buildCurrentLocationItem(BuildContext context, WeatherProvider provider) {
+    final settingsProvider = Provider.of<SettingsProvider>(context);
     final weather = provider.currentWeather;
     final city = provider.currentCity;
-    final temp = weather?.temperatureString ?? 'Loading...';
+    final temp = weather != null ? weather.getTemperatureString(settingsProvider) : 'Loading...';
     
     return ListTile(
       title: Row(
@@ -70,7 +72,7 @@ class LocationDrawer extends StatelessWidget {
           const Icon(Icons.location_on, size: 16, color: Colors.blue),
         ],
       ),
-      subtitle: Text('$temp'),
+      subtitle: Text(temp),
       selected: true,
       selectedTileColor: Colors.blue.withOpacity(0.1),
       onTap: () {

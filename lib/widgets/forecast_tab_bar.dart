@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/weather_provider.dart';
+import '../providers/settings_provider.dart';
 import '../models/weather_model.dart';
 import '../widgets/error_handler.dart';
 
@@ -29,30 +30,19 @@ class DailyForecastTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<WeatherProvider>(
       builder: (context, weatherProvider, child) {
+        final settingsProvider = Provider.of<SettingsProvider>(context);
         final error = weatherProvider.error;
         
         if (weatherProvider.isLoading) {
           return const Center(child: CircularProgressIndicator());
         }
         
-        // Если есть ошибка, показываем ее через ErrorHandler
+        // Показываем ошибку, если она есть
         if (error != null) {
-          // Показываем ошибку как полноэкранное сообщение, если нет данных
-          if (weatherProvider.forecast.isEmpty) {
-            return ErrorHandler.buildFullScreenError(
-              error,
-              onRetry: () {
-                weatherProvider.clearError();
-                weatherProvider.fetchForecast(weatherProvider.currentCity);
-              },
-            );
-          } else {
-            // Если есть данные, но также есть ошибка, показываем ее через попап
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              ErrorHandler.showError(context, error);
-              weatherProvider.clearError();
-            });
-          }
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ErrorHandler.showError(context, error);
+            weatherProvider.clearError();
+          });
         }
         
         if (weatherProvider.forecast.isEmpty) {
@@ -76,7 +66,7 @@ class DailyForecastTab extends StatelessWidget {
                 child: ListTile(
                   leading: const Icon(Icons.calendar_today),
                   title: Text("$date"),
-                  subtitle: Text("Температура: ${forecast.tempRangeString}\n${forecast.condition}"),
+                  subtitle: Text("Температура: ${forecast.getTempRangeString(settingsProvider)}\n${forecast.condition}"),
                   trailing: forecast.conditionIcon.isNotEmpty 
                     ? Image.network('https:${forecast.conditionIcon}', width: 40, height: 40)
                     : const Icon(Icons.wb_cloudy),
@@ -106,6 +96,7 @@ class Every6HoursForecastTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<WeatherProvider>(
       builder: (context, weatherProvider, child) {
+        final settingsProvider = Provider.of<SettingsProvider>(context);
         final error = weatherProvider.error;
         
         if (weatherProvider.isLoading) {
@@ -147,7 +138,7 @@ class Every6HoursForecastTab extends StatelessWidget {
                 child: ListTile(
                   leading: const Icon(Icons.access_time),
                   title: Text("$date, ${hourForecast.hourString}"),
-                  subtitle: Text("${hourForecast.tempString}\n${hourForecast.condition}"),
+                  subtitle: Text("${hourForecast.getTempString(settingsProvider)}\n${hourForecast.condition}"),
                   trailing: hourForecast.conditionIcon.isNotEmpty 
                     ? Image.network('https:${hourForecast.conditionIcon}', width: 40, height: 40)
                     : const Icon(Icons.wb_sunny),
@@ -174,6 +165,7 @@ class HourlyForecastTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<WeatherProvider>(
       builder: (context, weatherProvider, child) {
+        final settingsProvider = Provider.of<SettingsProvider>(context);
         final error = weatherProvider.error;
         
         if (weatherProvider.isLoading) {
@@ -223,7 +215,7 @@ class HourlyForecastTab extends StatelessWidget {
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("${hourForecast.tempString} · ${hourForecast.condition}"),
+                      Text("${hourForecast.getTempString(settingsProvider)} · ${hourForecast.condition}"),
                       Row(
                         children: [
                           Icon(Icons.water_drop, size: 14, color: Colors.blue[300]),
