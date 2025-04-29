@@ -7,6 +7,7 @@ import 'screens/map_screen.dart';
 import 'screens/settings_screen.dart';
 import 'widgets/drawer_menu.dart';
 import 'providers/weather_provider.dart';
+import 'providers/ecology_provider.dart';
 
 void main() => runApp(const WeatherApp());
 
@@ -29,6 +30,7 @@ class _WeatherAppState extends State<WeatherApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => WeatherProvider()),
+        ChangeNotifierProvider(create: (_) => EcologyProvider()),
       ],
       child: MaterialApp(
         title: 'Погода+',
