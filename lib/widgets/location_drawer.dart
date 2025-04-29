@@ -39,7 +39,10 @@ class LocationDrawer extends StatelessWidget {
               ListTile(
                 leading: const Icon(Icons.map),
                 title: const Text('Добавить на карте'),
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MapScreen())),
+                onTap: () => Navigator.push(
+                  context, 
+                  MaterialPageRoute(builder: (_) => const MapScreen(mode: MapMode.addLocation)),
+                ),
               ),
               const Divider(),
               // Текущий город

@@ -48,6 +48,26 @@ class WeatherProvider with ChangeNotifier {
     }
   }
   
+  // Метод для получения погоды по координатам
+  Future<void> fetchWeatherByCoordinates(double lat, double lon) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    
+    try {
+      final weather = await _weatherService.getWeatherByCoordinates(lat, lon);
+      _currentWeather = weather.weather;
+      _currentCity = weather.cityName;
+      _error = null;
+    } catch (e) {
+      _error = e.toString();
+      print(_error);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+  
   // Метод для получения прогноза
   Future<void> fetchForecast(String city, {int days = 7}) async {
     _isLoading = true;

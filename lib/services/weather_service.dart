@@ -29,6 +29,32 @@ class WeatherService {
     }
   }
   
+  // Получение погоды по координатам
+  Future<WeatherLocation> getWeatherByCoordinates(double lat, double lon) async {
+    try {
+      final coordinates = '$lat,$lon';
+      final response = await http.get(
+        Uri.parse('$baseUrl/current.json?key=$apiKey&q=$coordinates&aqi=no')
+      );
+      
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final cityName = data['location']['name'];
+        return WeatherLocation(
+          cityName: cityName,
+          weather: Weather.fromJson(data),
+        );
+      } else {
+        final errorMsg = response.body.isNotEmpty 
+            ? jsonDecode(response.body)['error']['message'] ?? 'Ошибка API'
+            : 'Ошибка ${response.statusCode}';
+        throw Exception('Ошибка при запросе погоды: $errorMsg');
+      }
+    } catch (e) {
+      throw Exception('Не удалось загрузить данные о погоде: $e');
+    }
+  }
+  
   // Получение прогноза на несколько дней
   Future<List<Forecast>> getForecast(String city, {int days = 7}) async {
     try {
@@ -51,4 +77,15 @@ class WeatherService {
       throw Exception('Не удалось загрузить прогноз погоды: $e');
     }
   }
+} 
+
+// Класс для хранения информации о погоде и местоположении
+class WeatherLocation {
+  final String cityName;
+  final Weather weather;
+  
+  WeatherLocation({
+    required this.cityName,
+    required this.weather,
+  });
 } 
