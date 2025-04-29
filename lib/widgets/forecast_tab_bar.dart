@@ -99,9 +99,11 @@ class DailyForecastTab extends StatelessWidget {
 class Every6HoursForecastTab extends StatelessWidget {
   const Every6HoursForecastTab({super.key});
 
+  // Интервалы для отображения прогноза каждые 6 часов
+  final List<int> sixHourIntervals = const [0, 6, 12, 18];
+
   @override
   Widget build(BuildContext context) {
-    final periods = ['00:00', '06:00', '12:00', '18:00'];
     return Consumer<WeatherProvider>(
       builder: (context, weatherProvider, child) {
         final error = weatherProvider.error;
@@ -123,21 +125,36 @@ class Every6HoursForecastTab extends StatelessWidget {
           return const Center(child: Text("Загрузка прогноза..."));
         }
         
-        // Временная заглушка - в будущем можно добавить более детальные данные
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: periods.length,
-          itemBuilder: (context, index) {
-            return Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              child: ListTile(
-                leading: const Icon(Icons.access_time),
-                title: Text("Период: ${periods[index]}"),
-                subtitle: const Text("Температура: 12°C\nПеременная облачность"),
-                trailing: const Icon(Icons.wb_sunny),
-              ),
-            );
-          },
+        // Создаем список для отображения прогноза по 6-часовым интервалам
+        final List<HourForecast> sixHourForecasts = [];
+        
+        // Собираем все 6-часовые прогнозы со всех дней
+        for (var forecast in weatherProvider.forecast) {
+          sixHourForecasts.addAll(forecast.getPeriodicForecasts(sixHourIntervals));
+        }
+        
+        return RefreshIndicator(
+          onRefresh: () => weatherProvider.fetchForecast(weatherProvider.currentCity),
+          child: ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: sixHourForecasts.length,
+            itemBuilder: (context, index) {
+              final hourForecast = sixHourForecasts[index];
+              final date = DateFormat('dd.MM').format(DateTime.parse(hourForecast.time.split(' ')[0]));
+              
+              return Card(
+                margin: const EdgeInsets.only(bottom: 12),
+                child: ListTile(
+                  leading: const Icon(Icons.access_time),
+                  title: Text("$date, ${hourForecast.hourString}"),
+                  subtitle: Text("${hourForecast.tempString}\n${hourForecast.condition}"),
+                  trailing: hourForecast.conditionIcon.isNotEmpty 
+                    ? Image.network('https:${hourForecast.conditionIcon}', width: 40, height: 40)
+                    : const Icon(Icons.wb_sunny),
+                ),
+              );
+            },
+          ),
         );
       },
     );
@@ -176,22 +193,54 @@ class HourlyForecastTab extends StatelessWidget {
           return const Center(child: Text("Загрузка прогноза..."));
         }
         
-        // Временная заглушка - в будущем можно добавить более детальные данные почасового прогноза
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: 12,
-          itemBuilder: (context, index) {
-            final hour = (index + 6) % 24;
-            return Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              child: ListTile(
-                leading: const Icon(Icons.schedule),
-                title: Text("Час: $hour:00"),
-                subtitle: const Text("Температура: 11°C\nЯсно"),
-                trailing: const Icon(Icons.wb_sunny_outlined),
-              ),
-            );
-          },
+        // Создаем список всех часовых прогнозов
+        final List<HourForecast> allHourlyForecasts = [];
+        
+        // Собираем почасовые прогнозы за все доступные дни
+        for (var forecast in weatherProvider.forecast) {
+          allHourlyForecasts.addAll(forecast.hourlyForecasts);
+        }
+        
+        // Сортируем по времени, если нужно
+        allHourlyForecasts.sort((a, b) => a.time.compareTo(b.time));
+        
+        // Ограничиваем количество, чтобы не перегружать интерфейс
+        final hourlyForecasts = allHourlyForecasts.take(24).toList();
+        
+        return RefreshIndicator(
+          onRefresh: () => weatherProvider.fetchForecast(weatherProvider.currentCity),
+          child: ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: hourlyForecasts.length,
+            itemBuilder: (context, index) {
+              final hourForecast = hourlyForecasts[index];
+              
+              return Card(
+                margin: const EdgeInsets.only(bottom: 8),
+                child: ListTile(
+                  leading: const Icon(Icons.schedule),
+                  title: Text("${hourForecast.hourString}"),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("${hourForecast.tempString} · ${hourForecast.condition}"),
+                      Row(
+                        children: [
+                          Icon(Icons.water_drop, size: 14, color: Colors.blue[300]),
+                          Text(" ${hourForecast.rainChanceString}  "),
+                          Icon(Icons.air, size: 14, color: Colors.grey),
+                          Text(" ${hourForecast.windString}"),
+                        ],
+                      ),
+                    ],
+                  ),
+                  trailing: hourForecast.conditionIcon.isNotEmpty 
+                    ? Image.network('https:${hourForecast.conditionIcon}', width: 40, height: 40)
+                    : const Icon(Icons.wb_sunny_outlined),
+                ),
+              );
+            },
+          ),
         );
       },
     );
