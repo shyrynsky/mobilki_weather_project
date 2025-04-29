@@ -12,6 +12,9 @@ class WeatherProvider with ChangeNotifier {
   bool _isLoading = false;
   String? _error;
   
+  // Функция для синхронизации города с другими провайдерами
+  Function(String)? onCityChanged;
+  
   // Геттеры
   Weather? get currentWeather => _currentWeather;
   List<Forecast> get forecast => _forecast;
@@ -76,6 +79,11 @@ class WeatherProvider with ChangeNotifier {
     if (newCity.isNotEmpty && newCity != _currentCity) {
       _currentCity = newCity;
       refreshAllData();
+      
+      // Уведомить других провайдеров об изменении города
+      if (onCityChanged != null) {
+        onCityChanged!(newCity);
+      }
     }
   }
   

@@ -11,6 +11,9 @@ class EcologyProvider with ChangeNotifier {
   bool _isLoading = false;
   String? _error;
   
+  // Функция для синхронизации города с другими провайдерами
+  Function(String)? onCityChanged;
+  
   // Геттеры
   EcologyData? get ecologyData => _ecologyData;
   String get currentCity => _currentCity;
@@ -101,6 +104,11 @@ class EcologyProvider with ChangeNotifier {
     if (newCity.isNotEmpty && newCity != _currentCity) {
       _currentCity = newCity;
       refreshAllData();
+      
+      // Уведомить других провайдеров об изменении города
+      if (onCityChanged != null) {
+        onCityChanged!(newCity);
+      }
     }
   }
   

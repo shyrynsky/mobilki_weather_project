@@ -20,6 +20,10 @@ class WeatherApp extends StatefulWidget {
 
 class WeatherAppState extends State<WeatherApp> {
   bool _isDarkMode = false;
+  
+  // Создаем провайдеры заранее для установки связи между ними
+  late final WeatherProvider _weatherProvider = WeatherProvider();
+  late final EcologyProvider _ecologyProvider = EcologyProvider();
 
   void toggleTheme(bool value) {
     setState(() => _isDarkMode = value);
@@ -29,13 +33,27 @@ class WeatherAppState extends State<WeatherApp> {
   static WeatherAppState? of(BuildContext context) {
     return context.findAncestorStateOfType<WeatherAppState>();
   }
+  
+  @override
+  void initState() {
+    super.initState();
+    // Устанавливаем связь между провайдерами для синхронизации города
+    _weatherProvider.onCityChanged = (city) {
+      _ecologyProvider.changeCity(city);
+    };
+    
+    // Двусторонняя синхронизация
+    _ecologyProvider.onCityChanged = (city) {
+      _weatherProvider.changeCity(city);
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => WeatherProvider()),
-        ChangeNotifierProvider(create: (_) => EcologyProvider()),
+        ChangeNotifierProvider<WeatherProvider>.value(value: _weatherProvider),
+        ChangeNotifierProvider<EcologyProvider>.value(value: _ecologyProvider),
         ChangeNotifierProvider(create: (_) => SettingsProvider()),
       ],
       child: MaterialApp(
