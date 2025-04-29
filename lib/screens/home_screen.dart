@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../widgets/location_drawer.dart';
 import '../widgets/weather_card.dart';
-import '../widgets/drawer_menu.dart';
 import '../providers/weather_provider.dart';
 import '../models/weather_model.dart';
 import '../widgets/error_handler.dart';
@@ -15,9 +14,11 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          IconButton(
-            icon: const Icon(Icons.location_pin),
-            onPressed: () => Scaffold.of(context).openEndDrawer(),
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.location_pin),
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+            ),
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -27,16 +28,9 @@ class HomeScreen extends StatelessWidget {
             },
           ),
         ],
-        title: const Text('Погода+'),
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
+        automaticallyImplyLeading: true,
       ),
       endDrawer: const LocationDrawer(),
-      drawer: const DrawerMenu(),
       body: Consumer<WeatherProvider>(
         builder: (context, weatherProvider, child) {
           final weather = weatherProvider.currentWeather;
