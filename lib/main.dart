@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'screens/home_screen.dart';
 import 'screens/forecast_screen.dart';
 import 'screens/ecology/air_screen.dart';
 import 'screens/map_screen.dart';
 import 'screens/settings_screen.dart';
 import 'widgets/drawer_menu.dart';
+import 'providers/weather_provider.dart';
 
 void main() => runApp(const WeatherApp());
 
@@ -24,23 +26,28 @@ class _WeatherAppState extends State<WeatherApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Погода+',
-      theme: _isDarkMode
-          ? ThemeData.dark().copyWith(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue,
-          brightness: Brightness.dark,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => WeatherProvider()),
+      ],
+      child: MaterialApp(
+        title: 'Погода+',
+        theme: _isDarkMode
+            ? ThemeData.dark().copyWith(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.blue,
+            brightness: Brightness.dark,
+          ),
+        )
+            : ThemeData.light().copyWith(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.blue,
+            brightness: Brightness.light,
+          ),
         ),
-      )
-          : ThemeData.light().copyWith(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue,
-          brightness: Brightness.light,
-        ),
+        home: MainNavigation(toggleTheme: _toggleTheme),
+        debugShowCheckedModeBanner: false,
       ),
-      home: MainNavigation(toggleTheme: _toggleTheme),
-      debugShowCheckedModeBanner: false,
     );
   }
 }
