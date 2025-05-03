@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_background"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <!-- Температура -->
+        <TextView
+            android:id="@+id/widget_temp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="20°C"
+            android:textSize="36sp"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:layout_marginEnd="16dp"
+            android:shadowColor="#80000000"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="2"/>
+
+        <!-- Город и состояние -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/widget_city"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Минск"
+                android:textSize="16sp"
+                android:textColor="#E6FFFFFF"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+
+            <TextView
+                android:id="@+id/widget_condition"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Облачно"
+                android:textSize="14sp"
+                android:textColor="#E6FFFFFF"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+        </LinearLayout>
+
+        <!-- Увеличенная иконка состояния (48dp → 64dp) -->
+        <ImageView
+            android:id="@+id/widget_icon"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/ic_weather_placeholder"
+            android:contentDescription="Weather Icon"
+            android:layout_marginStart="16dp"/>
+    </LinearLayout>
+
+    <!-- Нижний ряд: влажность и ветер -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:gravity="start"
+        android:layout_marginTop="8dp">
+
+        <TextView
+            android:id="@+id/widget_humidity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_humidity"
+            android:drawablePadding="4dp"
+            android:text="60%"
+            android:textSize="12sp"
+            android:textColor="#E6FFFFFF"/>
+
+        <TextView
+            android:id="@+id/widget_wind"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:drawableLeft="@drawable/ic_wind"
+            android:drawablePadding="4dp"
+            android:text="5 м/с"
+            android:textSize="12sp"
+            android:textColor="#E6FFFFFF"/>
+    </LinearLayout>
+</LinearLayout>

@@ -7,16 +7,16 @@ class WeatherService {
   // Получаем API ключ из конфигурационного файла
   final String apiKey = ApiKeys.weatherApiKey;
   final String baseUrl = 'https://api.weatherapi.com/v1';
-  
+
   // Получение текущей погоды
   Future<Weather> getCurrentWeather(String city) async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/current.json?key=$apiKey&q=$city&aqi=no')
+        Uri.parse('$baseUrl/current.json?key=$apiKey&q=$city&aqi=no&lang=ru')
       );
       
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
         return Weather.fromJson(data);
       } else {
         final errorMsg = response.body.isNotEmpty 

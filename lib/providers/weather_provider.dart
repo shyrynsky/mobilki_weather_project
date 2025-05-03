@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/weather_model.dart';
 import '../services/weather_service.dart';
 import '../constants.dart';
@@ -32,22 +34,34 @@ class WeatherProvider with ChangeNotifier {
     _isLoading = true;
     _error = null;
     notifyListeners();
-    
+
     try {
       final weather = await _weatherService.getCurrentWeather(city);
       _currentWeather = weather;
       _currentCity = city;
       _error = null;
+
+      if (weather != null) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('city', city);
+        await prefs.setString('temp', weather.temperatureString);
+        await prefs.setString('condition', weather.condition);
+        await prefs.setString('humidity', weather.humidity.toString());
+        await prefs.setString('wind', weather.windSpeed.toString());
+        await prefs.setString('icon_url', "https:" + weather.conditionIcon);
+
+
+        await const MethodChannel('widget_channel').invokeMethod('updateWidget');
+      }
+
     } catch (e) {
       _error = e.toString();
-      // Оставляем предыдущие данные, если они есть
       print(_error);
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
-  
   // Метод для получения погоды по координатам
   Future<void> fetchWeatherByCoordinates(double lat, double lon) async {
     _isLoading = true;
