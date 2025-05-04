@@ -80,13 +80,20 @@ class _TravelWardrobeScreenState extends State<TravelWardrobeScreen> with Single
     
     // Если не режим диапазона, возвращаем только начальную дату
     if (!_isRangeDateMode) {
-      return [_startDate];
+      // Создаем копию даты с только необходимыми полями (без времени)
+      return [DateTime(_startDate.year, _startDate.month, _startDate.day)];
     }
     
     // Генерируем все даты в диапазоне
     DateTime current = DateTime(_startDate.year, _startDate.month, _startDate.day);
     final end = DateTime(_endDate.year, _endDate.month, _endDate.day);
     
+    // Убедимся, что даты идут в правильном порядке
+    if (current.isAfter(end)) {
+      return [current]; // Если что-то не так, возвращаем только начальную дату
+    }
+    
+    // Добавляем все даты в диапазоне
     while (!current.isAfter(end)) {
       dates.add(current);
       current = current.add(const Duration(days: 1));
@@ -117,11 +124,17 @@ class _TravelWardrobeScreenState extends State<TravelWardrobeScreen> with Single
       return;
     }
     
-    // Показываем индикатор загрузки и сбрасываем режим
+    // Показываем индикатор загрузки и сохраняем текущий режим для сброса после завершения
+    bool wasRangeMode = _isRangeDateMode;
     setState(() => _isRangeDateMode = false);
     
-    // Используем оптимизированный метод для добавления всех дат за один API-запрос
-    await wardrobeProvider.addCityToTravelPlanForDateRange(_cityController.text, datesInRange);
+    if (datesInRange.length == 1) {
+      // Если это одиночная дата, используем простой метод
+      await wardrobeProvider.addCityToTravelPlan(_cityController.text, datesInRange[0]);
+    } else {
+      // Иначе используем оптимизированный метод для диапазона
+      await wardrobeProvider.addCityToTravelPlanForDateRange(_cityController.text, datesInRange);
+    }
     
     if (wardrobeProvider.error == null) {
       _cityController.clear();
@@ -129,10 +142,16 @@ class _TravelWardrobeScreenState extends State<TravelWardrobeScreen> with Single
       setState(() {
         _startDate = DateTime.now().add(const Duration(days: 1));
         _endDate = DateTime.now().add(const Duration(days: 1));
+        _isRangeDateMode = false; // Всегда сбрасываем режим диапазона после успешного добавления
       });
       
       // Переключаемся на список городов после добавления
       _tabController.animateTo(1);
+    } else {
+      // В случае ошибки восстанавливаем предыдущий режим
+      setState(() {
+        _isRangeDateMode = wasRangeMode;
+      });
     }
   }
 
@@ -218,8 +237,22 @@ class _TravelWardrobeScreenState extends State<TravelWardrobeScreen> with Single
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.calendar_today),
                 ),
-                child: Text(
-                  DateFormat('dd.MM.yyyy').format(_startDate),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      DateFormat('dd.MM.yyyy').format(_startDate),
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Добавление города на один день',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
