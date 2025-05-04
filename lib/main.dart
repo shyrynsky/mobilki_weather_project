@@ -112,7 +112,7 @@ class MainNavigationState extends State<MainNavigation> {
   }
 
   String _getTitle(int index) {
-    const titles = ["Погода", "Прогноз", "Гардероб", "Экология", "Карта"];
+    const titles = ["Погода", "Прогноз", "Гардероб", "Воздух", "Карта"];
     return titles[index];
   }
 
@@ -138,8 +138,8 @@ class MainNavigationState extends State<MainNavigation> {
           label: 'Гардероб',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.eco),
-          label: 'Экология',
+          icon: Icon(Icons.air),
+          label: 'Воздух',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.map),

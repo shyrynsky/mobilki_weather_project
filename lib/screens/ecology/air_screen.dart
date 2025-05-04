@@ -3,46 +3,13 @@ import 'package:provider/provider.dart';
 import '../../providers/ecology_provider.dart';
 import '../../widgets/error_handler.dart';
 import '../../models/ecology_model.dart';
-import 'water_screen.dart';
-import 'radiation_screen.dart';
-import 'agro_screen.dart';
-import 'chernobyl_screen.dart';
 
 class AirScreen extends StatelessWidget {
   const AirScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const DefaultTabController(
-      length: 5,
-      child: Column(
-        children: [
-          TabBar(
-            labelColor: Colors.blue,
-            unselectedLabelColor: Colors.grey,
-            isScrollable: true,
-            tabs: [
-              Tab(text: 'Воздух'),
-              Tab(text: 'Вода'),
-              Tab(text: 'Радиация'),
-              Tab(text: 'Агро'),
-              Tab(text: 'Чернобыль'),
-            ],
-          ),
-          Expanded(
-            child: TabBarView(
-              children: [
-                AirContent(),
-                WaterScreen(),
-                RadiationScreen(),
-                AgroScreen(),
-                ChernobylScreen(),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+    return const AirContent();
   }
 }
 
