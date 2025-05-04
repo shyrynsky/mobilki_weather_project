@@ -34,11 +34,11 @@ class WeatherService {
     try {
       final coordinates = '$lat,$lon';
       final response = await http.get(
-        Uri.parse('$baseUrl/current.json?key=$apiKey&q=$coordinates&aqi=no')
+        Uri.parse('$baseUrl/current.json?key=$apiKey&q=$coordinates&aqi=no&lang=ru')
       );
       
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
         final cityName = data['location']['name'];
         return WeatherLocation(
           cityName: cityName,
@@ -59,11 +59,11 @@ class WeatherService {
   Future<List<Forecast>> getForecast(String city, {int days = 7}) async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/forecast.json?key=$apiKey&q=$city&days=$days&aqi=no')
+        Uri.parse('$baseUrl/forecast.json?key=$apiKey&q=$city&days=$days&aqi=no&lang=ru')
       );
       
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
         final List forecastData = data['forecast']['forecastday'];
         
         return forecastData.map((day) => Forecast.fromJson(day)).toList();
