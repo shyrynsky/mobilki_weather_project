@@ -71,7 +71,7 @@ class WardrobeService {
         break;
       case "very warm":
         description = "Очень холодно! Одевайтесь максимально тепло.";
-        items = ["Термобелье", "Свитер/толстовка", "Зимняя куртка/пуховик", "Шапка/шарф/перчатки", "Теплая обувь"];
+        items = ["Термобелье", "Свитер/толстовка", "Зимняя куртка/пуховик", "Шапка/перчатки", "Шарф", "Теплая обувь"];
         break;
       default:
         description = "Проверьте прогноз погоды.";
@@ -272,11 +272,12 @@ class WardrobeService {
     Map<String, int> optimizedCounts = {};
     clothingCounts.forEach((item, count) {
       // Для верхней одежды берем минимум вещей
-      if (item.contains("куртка") || item.contains("пальто") || item.contains("пуховик")) {
+      if (item.contains("куртка") || item.contains("пальто") || item.contains("пуховик") ||
+          item.contains("Шапка") || item.contains("обувь") || item.contains("Шарф") ) {
         optimizedCounts[item] = 1;
-      } 
+      }
       // Для футболок и нижней одежды - более либерально
-      else if (item.contains("Футболка") || item.contains("майка") || item.contains("белье")) {
+      else if (item.contains("Футболка") || item.contains("майка") ) {
         optimizedCounts[item] = (count / 2).ceil();
       }
       // Для остального - среднее количество
