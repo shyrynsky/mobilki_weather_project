@@ -120,15 +120,8 @@ class _TravelWardrobeScreenState extends State<TravelWardrobeScreen> with Single
     // Показываем индикатор загрузки и сбрасываем режим
     setState(() => _isRangeDateMode = false);
     
-    // Добавляем каждую дату из диапазона
-    for (final date in datesInRange) {
-      await wardrobeProvider.addCityToTravelPlan(_cityController.text, date);
-      
-      // Если возникла ошибка, прерываем
-      if (wardrobeProvider.error != null) {
-        break;
-      }
-    }
+    // Используем оптимизированный метод для добавления всех дат за один API-запрос
+    await wardrobeProvider.addCityToTravelPlanForDateRange(_cityController.text, datesInRange);
     
     if (wardrobeProvider.error == null) {
       _cityController.clear();

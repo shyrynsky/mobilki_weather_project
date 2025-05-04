@@ -135,6 +135,96 @@ class WardrobeProvider with ChangeNotifier {
     }
   }
   
+  // Добавить диапазон дат для города (оптимизированный метод с единым запросом)
+  Future<void> addCityToTravelPlanForDateRange(String city, List<DateTime> dates) async {
+    if (dates.isEmpty) return;
+    
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    
+    try {
+      // Находим максимальное количество дней для прогноза
+      final DateTime now = DateTime.now();
+      final DateTime farthestDate = dates.reduce((a, b) => a.isAfter(b) ? a : b);
+      final int daysNeeded = farthestDate.difference(now).inDays + 1;
+      
+      // Ограничиваем до 14 дней (максимум API)
+      final int daysToRequest = daysNeeded > 14 ? 14 : daysNeeded;
+      
+      // Делаем единственный запрос к API для получения прогноза на все даты
+      final List<Forecast> forecasts = await _weatherService.getForecast(city, days: daysToRequest);
+      
+      // Для каждой даты создаем план поездки, но используем уже загруженный прогноз
+      for (final date in dates) {
+        final dateString = DateFormat('yyyy-MM-dd').format(date);
+        
+        // Проверяем есть ли прогноз на эту дату
+        final forecastIndex = forecasts.indexWhere((f) => f.date == dateString);
+        
+        if (forecastIndex == -1) {
+          // Если даты нет в прогнозе, пропускаем (например, она слишком далекая)
+          continue;
+        }
+        
+        final forecast = forecasts[forecastIndex];
+        
+        // Создаем "виртуальную" погоду из прогноза для получения рекомендации
+        final weather = Weather(
+          cityName: city,
+          temperature: (forecast.maxTemp + forecast.minTemp) / 2,
+          condition: forecast.condition,
+          conditionIcon: forecast.conditionIcon,
+          humidity: 0,
+          pressure: 0,
+          windSpeed: 0,
+          uvIndex: 0,
+        );
+        
+        // Получаем рекомендацию по одежде для этого дня
+        ClothingRecommendation recommendation;
+        
+        if (forecast.hourlyForecasts.isNotEmpty) {
+          recommendation = _wardrobeService.getDailyRecommendationWithForecast(
+            weather, 
+            forecast.hourlyForecasts
+          );
+        } else {
+          recommendation = _wardrobeService.getDailyRecommendation(weather);
+        }
+        
+        // Создаем план на этот день
+        final travelPlan = TravelPlan(
+          cityName: city,
+          date: date,
+          recommendation: recommendation,
+        );
+        
+        // Добавляем в список или заменяем существующий на эту дату
+        final existingIndex = _travelPlans.indexWhere(
+          (plan) => DateFormat('yyyy-MM-dd').format(plan.date) == dateString
+        );
+        
+        if (existingIndex >= 0) {
+          _travelPlans[existingIndex] = travelPlan;
+        } else {
+          _travelPlans.add(travelPlan);
+        }
+      }
+      
+      // Сортируем по дате
+      _travelPlans.sort((a, b) => a.date.compareTo(b.date));
+      
+      // Обновляем список упаковки
+      _updatePackingList();
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+  
   // Удалить город из плана путешествия
   void removeCityFromTravelPlan(int index) {
     if (index >= 0 && index < _travelPlans.length) {
