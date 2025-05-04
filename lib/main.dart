@@ -4,10 +4,12 @@ import 'screens/home_screen.dart';
 import 'screens/forecast_screen.dart';
 import 'screens/ecology/air_screen.dart';
 import 'screens/map_screen.dart';
+import 'screens/wardrobe_screen.dart';
 import 'widgets/drawer_menu.dart';
 import 'providers/weather_provider.dart';
 import 'providers/ecology_provider.dart';
 import 'providers/settings_provider.dart';
+import 'providers/wardrobe_provider.dart';
 
 void main() => runApp(const WeatherApp());
 
@@ -55,6 +57,7 @@ class WeatherAppState extends State<WeatherApp> {
         ChangeNotifierProvider<WeatherProvider>.value(value: _weatherProvider),
         ChangeNotifierProvider<EcologyProvider>.value(value: _ecologyProvider),
         ChangeNotifierProvider(create: (_) => SettingsProvider()),
+        ChangeNotifierProvider(create: (_) => WardrobeProvider()),
       ],
       child: MaterialApp(
         title: 'Погода+',
@@ -93,6 +96,7 @@ class MainNavigationState extends State<MainNavigation> {
   late final List<Widget> _screens = [
     const HomeScreen(),
     const ForecastScreen(),
+    const WardrobeScreen(),
     const AirScreen(),
     const MapScreen(),
   ];
@@ -108,7 +112,7 @@ class MainNavigationState extends State<MainNavigation> {
   }
 
   String _getTitle(int index) {
-    const titles = ["Погода", "Прогноз", "Экология", "Карта"];
+    const titles = ["Погода", "Прогноз", "Гардероб", "Экология", "Карта"];
     return titles[index];
   }
 
@@ -128,6 +132,10 @@ class MainNavigationState extends State<MainNavigation> {
         BottomNavigationBarItem(
           icon: Icon(Icons.calendar_today),
           label: 'Прогноз',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.checkroom),
+          label: 'Гардероб',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.eco),
