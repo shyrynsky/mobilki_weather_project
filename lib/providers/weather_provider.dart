@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/weather_model.dart';
 import '../services/weather_service.dart';
+import '../services/location_service.dart';
 import '../constants.dart';
 
 class WeatherProvider with ChangeNotifier {
@@ -26,7 +27,27 @@ class WeatherProvider with ChangeNotifier {
   
   // Инициализация при старте
   WeatherProvider() {
-    fetchWeatherData(_currentCity);
+    _initializeWithLocation();
+  }
+
+  // Метод для инициализации с геолокацией
+  Future<void> _initializeWithLocation() async {
+    final hasPermission = await LocationService.checkLocationPermission();
+    if (hasPermission) {
+      final city = await LocationService.getCurrentCity();
+      if (city != null) {
+        _currentCity = city;
+        await fetchWeatherData(city);
+        return;
+      }
+    }
+    // Если не удалось получить город по геолокации, используем сохраненный или дефолтный
+    final prefs = await SharedPreferences.getInstance();
+    final savedCity = prefs.getString('city');
+    if (savedCity != null) {
+      _currentCity = savedCity;
+    }
+    await fetchWeatherData(_currentCity);
   }
   
   // Метод для получения текущей погоды

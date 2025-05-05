@@ -50,7 +50,7 @@ class NotificationService {
         task['tag'],
         task['task'],
         frequency: Duration(days: 1),
-        initialDelay: Duration(seconds: 5),
+        initialDelay: task['delay'],
         constraints: Constraints(networkType: NetworkType.connected),
 
       );
@@ -68,15 +68,14 @@ class NotificationService {
 
 
   static Duration _calculateInitialDelay(TimeOfDay time) {
-    return const Duration(seconds: 10);
-    // final now = DateTime.now();
-    // var scheduledTime = DateTime(now.year, now.month, now.day, time.hour, time.minute);
-    //
-    // if (scheduledTime.isBefore(now)) {
-    //   scheduledTime = scheduledTime.add(const Duration(days: 1));
-    // }
-    //
-    // return scheduledTime.difference(now);
+    final now = DateTime.now();
+    var scheduledTime = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    
+    if (scheduledTime.isBefore(now)) {
+      scheduledTime = scheduledTime.add(const Duration(days: 1));
+    }
+    
+    return scheduledTime.difference(now);
   }
   static final WeatherService _weatherService = WeatherService();
 
