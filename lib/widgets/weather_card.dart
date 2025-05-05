@@ -63,7 +63,9 @@ class WeatherCard extends StatelessWidget {
         
         return Container(
           decoration: BoxDecoration(
-            color: Colors.blue[100],
+            color: Theme.of(context).brightness == Brightness.dark 
+                ? Colors.blue[900] 
+                : Colors.blue[100],
             borderRadius: BorderRadius.circular(16),
           ),
           padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
@@ -82,12 +84,24 @@ class WeatherCard extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 weather.condition,
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                  fontSize: 24, 
+                  fontWeight: FontWeight.w500,
+                  color: Theme.of(context).brightness == Brightness.dark 
+                      ? Colors.white 
+                      : Colors.black,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
                 weather.getTemperatureString(settingsProvider),
-                style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 40, 
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).brightness == Brightness.dark 
+                      ? Colors.white 
+                      : Colors.black,
+                ),
               ),
             ],
           ),

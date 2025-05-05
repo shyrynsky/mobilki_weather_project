@@ -27,18 +27,52 @@ class LocationDrawer extends StatelessWidget {
           return ListView(
             padding: EdgeInsets.zero,
             children: [
-              const DrawerHeader(
-                decoration: BoxDecoration(color: Colors.blue),
-                child: Text('Мои места', style: TextStyle(color: Colors.white)),
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).brightness == Brightness.dark 
+                      ? Colors.blue[900] 
+                      : Colors.blue[700],
+                ),
+                child: Text(
+                  'Мои места', 
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                  )
+                ),
               ),
               ListTile(
-                leading: const Icon(Icons.add),
-                title: const Text('Добавить по названию'),
+                leading: Icon(
+                  Icons.add,
+                  color: Theme.of(context).brightness == Brightness.dark 
+                      ? Colors.white 
+                      : Colors.black,
+                ),
+                title: Text(
+                  'Добавить по названию',
+                  style: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark 
+                        ? Colors.white 
+                        : Colors.black,
+                  ),
+                ),
                 onTap: () => _showAddLocationDialog(context, weatherProvider),
               ),
               ListTile(
-                leading: const Icon(Icons.map),
-                title: const Text('Добавить на карте'),
+                leading: Icon(
+                  Icons.map,
+                  color: Theme.of(context).brightness == Brightness.dark 
+                      ? Colors.white 
+                      : Colors.black,
+                ),
+                title: Text(
+                  'Добавить на карте',
+                  style: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark 
+                        ? Colors.white 
+                        : Colors.black,
+                  ),
+                ),
                 onTap: () => Navigator.push(
                   context, 
                   MaterialPageRoute(builder: (_) => const MapScreen(mode: MapMode.addLocation)),
@@ -48,12 +82,10 @@ class LocationDrawer extends StatelessWidget {
               // Текущий город
               _buildCurrentLocationItem(context, weatherProvider),
               
-              // Здесь можно добавить сохраненные города
-              // Пока используем статические данные, но в будущем можно сохранять историю
-              _buildLocationItem(context, 'Минск', weatherProvider),
-              _buildLocationItem(context, 'Москва', weatherProvider),
-              _buildLocationItem(context, 'Киев', weatherProvider),
-              _buildLocationItem(context, 'Берлин', weatherProvider),
+              // Список сохраненных мест
+              ...weatherProvider.savedLocations.map((location) => 
+                _buildLocationItem(context, location, weatherProvider)
+              ),
             ],
           );
         },
@@ -85,15 +117,28 @@ class LocationDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildLocationItem(BuildContext context, String name, WeatherProvider provider) {
-    final isCurrentLocation = name == provider.currentCity;
-    
+  Widget _buildLocationItem(BuildContext context, String location, WeatherProvider provider) {
     return ListTile(
-      title: Text(name),
-      selected: isCurrentLocation,
-      selectedTileColor: isCurrentLocation ? Colors.blue.withOpacity(0.1) : null,
+      leading: Icon(
+        Icons.location_city,
+        color: Theme.of(context).brightness == Brightness.dark 
+            ? Colors.white 
+            : Colors.black,
+      ),
+      title: Text(
+        location,
+        style: TextStyle(
+          color: Theme.of(context).brightness == Brightness.dark 
+              ? Colors.white 
+              : Colors.black,
+        ),
+      ),
+      trailing: IconButton(
+        icon: const Icon(Icons.delete_outline),
+        onPressed: () => provider.removeLocation(location),
+      ),
       onTap: () {
-        provider.changeCity(name);
+        provider.changeCity(location);
         Navigator.pop(context);
       },
     );
@@ -116,8 +161,9 @@ class LocationDrawer extends StatelessWidget {
             child: const Text('Отмена'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               if (controller.text.isNotEmpty) {
+                await provider.addLocation(controller.text);
                 provider.changeCity(controller.text);
                 Navigator.pop(context);
               }

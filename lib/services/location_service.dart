@@ -1,6 +1,7 @@
 import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class LocationService {
   static Future<String?> getCurrentCity() async {
@@ -14,16 +15,15 @@ class LocationService {
           desiredAccuracy: LocationAccuracy.high,
         );
 
-        // Преобразуем координаты в адрес
-        final placemarks = await placemarkFromCoordinates(
-          position.latitude,
-          position.longitude,
-          localeIdentifier: 'ru',
-        );
+        // Используем OSM Nominatim API для получения адреса
+        final response = await http.get(Uri.parse(
+          'https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.latitude}&lon=${position.longitude}&accept-language=ru'
+        ));
 
-        if (placemarks.isNotEmpty) {
-          final placemark = placemarks.first;
-          return placemark.locality ?? placemark.subAdministrativeArea;
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          final address = data['address'];
+          return address['city'] ?? address['town'] ?? address['village'] ?? address['suburb'];
         }
       }
       return null;

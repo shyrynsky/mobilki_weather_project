@@ -5,7 +5,7 @@ import 'screens/forecast_screen.dart';
 import 'screens/ecology/air_screen.dart';
 import 'screens/map_screen.dart';
 import 'screens/wardrobe_screen.dart';
-import 'widgets/drawer_menu.dart';
+import 'screens/units_settings_screen.dart';
 import 'providers/weather_provider.dart';
 import 'providers/ecology_provider.dart';
 import 'providers/settings_provider.dart';
@@ -40,16 +40,8 @@ void main() async {
   // Инициализация Workmanager
   await Workmanager().initialize(
     callbackDispatcher,
-    isInDebugMode: true,
+    isInDebugMode: false,
   );
-  // Workmanager().registerOneOffTask(
-  //   "initTest",
-  //   "rain_notifications",
-  //   // frequency: Duration(days: 1),
-  //   initialDelay: Duration(seconds: 5),
-  //   // constraints: Constraints(networkType: NetworkType.connected),
-  //   // tag: 'rain_notifications'
-  // );
 
   runApp(const WeatherApp());
 }
@@ -149,10 +141,26 @@ class MainNavigationState extends State<MainNavigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_getTitle(_currentIndex))),
+      appBar: AppBar(
+        title: Text(_getTitle(_currentIndex)),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const UnitsSettingsScreen()),
+              );
+              
+              if (result != null && result is bool) {
+                widget.toggleTheme(result);
+              }
+            },
+          ),
+        ],
+      ),
       body: _screens[_currentIndex],
       bottomNavigationBar: _buildBottomNavigationBar(),
-      drawer: const DrawerMenu(),
     );
   }
 

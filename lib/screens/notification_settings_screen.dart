@@ -81,24 +81,40 @@ class NotificationSettingsScreen extends StatelessWidget {
       Function(bool) onChanged,
       Function(TimeOfDay) onTimeChanged,
       ) {
+    final settings = Provider.of<SettingsProvider>(context);
+    final isEnabled = settings.notificationsEnabled;
+    
     return Column(
       children: [
         SwitchListTile(
-          title: Text(title),
+          title: Text(
+            title,
+            style: TextStyle(
+              color: isEnabled ? null : Colors.grey,
+            ),
+          ),
           value: value,
-          onChanged: onChanged,
+          onChanged: isEnabled ? onChanged : null,
         ),
         if (value)
           ListTile(
-            title: Text('Время уведомления: ${time.format(context)}'),
-            trailing: const Icon(Icons.access_time),
-            onTap: () async {
+            title: Text(
+              'Время уведомления: ${time.format(context)}',
+              style: TextStyle(
+                color: isEnabled ? null : Colors.grey,
+              ),
+            ),
+            trailing: Icon(
+              Icons.access_time,
+              color: isEnabled ? null : Colors.grey,
+            ),
+            onTap: isEnabled ? () async {
               final newTime = await showTimePicker(
                 context: context,
                 initialTime: time,
               );
               if (newTime != null) onTimeChanged(newTime);
-            },
+            } : null,
           ),
       ],
     );

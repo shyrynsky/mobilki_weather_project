@@ -12,24 +12,6 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          Builder(
-            builder: (context) => IconButton(
-              icon: const Icon(Icons.location_pin),
-              onPressed: () => Scaffold.of(context).openEndDrawer(),
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              final provider = Provider.of<WeatherProvider>(context, listen: false);
-              provider.refreshAllData();
-            },
-          ),
-        ],
-        automaticallyImplyLeading: true,
-      ),
       endDrawer: const LocationDrawer(),
       body: Consumer<WeatherProvider>(
         builder: (context, weatherProvider, child) {
@@ -75,6 +57,16 @@ class HomeScreen extends StatelessWidget {
         icon: const Icon(Icons.search),
         onPressed: () {
           _showCitySearchDialog(context);
+        },
+      ),
+      IconButton(
+        icon: const Icon(Icons.location_pin),
+        onPressed: () => Scaffold.of(context).openEndDrawer(),
+      ),
+      IconButton(
+        icon: const Icon(Icons.refresh),
+        onPressed: () {
+          provider.refreshAllData();
         },
       ),
     ],

@@ -64,9 +64,12 @@ class RightDrawerMenu extends StatelessWidget {
                   ListTile(
                     leading: const Icon(Icons.add_location),
                     title: const Text("Добавить как место"),
-                    onTap: () {
+                    onTap: () async {
                       // Закрываем меню
                       Navigator.pop(context);
+                      
+                      // Добавляем место в список
+                      await weatherProvider.addLocation(weatherProvider.currentCity);
                       
                       // Показываем сообщение
                       ScaffoldMessenger.of(context).showSnackBar(

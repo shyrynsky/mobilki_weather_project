@@ -195,24 +195,34 @@ class _MapScreenState extends State<MapScreen> {
                 left: 20,
                 right: 20,
                 child: Card(
-                  color: Colors.white.withOpacity(0.9),
+                  color: Theme.of(context).brightness == Brightness.dark 
+                      ? Colors.grey[900] 
+                      : Colors.white.withOpacity(0.9),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text(
+                        Text(
                           'Нажмите на карту, чтобы посмотреть информацию о погоде',
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 16),
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Theme.of(context).brightness == Brightness.dark 
+                                ? Colors.white 
+                                : Colors.black,
+                          ),
                         ),
                         if (_locationInfo.isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
                               _locationInfo,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontStyle: FontStyle.italic,
+                                color: Theme.of(context).brightness == Brightness.dark 
+                                    ? Colors.white70 
+                                    : Colors.black87,
                               ),
                             ),
                           ),
@@ -333,9 +343,12 @@ class _MapScreenState extends State<MapScreen> {
   }
   
   // Добавление выбранного города
-  void _addSelectedCity(BuildContext context) {
+  void _addSelectedCity(BuildContext context) async {
     if (_selectedCity.isNotEmpty) {
       final weatherProvider = Provider.of<WeatherProvider>(context, listen: false);
+      // Добавляем место в список сохраненных
+      await weatherProvider.addLocation(_selectedCity);
+      // Устанавливаем как текущий город
       weatherProvider.changeCity(_selectedCity);
       Navigator.pop(context);
     }
@@ -361,8 +374,15 @@ class _MapScreenState extends State<MapScreen> {
     } else if ((point.latitude - 52.52).abs() < 1 && (point.longitude - 13.4).abs() < 1) {
       cityName = "Берлин";
     } else {
-      // Генерируем название на основе координат
-      cityName = "Место ($lat, $lng)";
+      // Используем API для получения названия города по координатам
+      try {
+        final weatherService = WeatherService();
+        final location = await weatherService.getWeatherByCoordinates(point.latitude, point.longitude);
+        cityName = location.cityName;
+      } catch (e) {
+        // Если не удалось получить название города, используем координаты
+        cityName = "Место ($lat, $lng)";
+      }
     }
     
     return LocationInfo(

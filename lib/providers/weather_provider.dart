@@ -14,6 +14,7 @@ class WeatherProvider with ChangeNotifier {
   String _currentCity = AppConstants.defaultCity;
   bool _isLoading = false;
   String? _error;
+  List<String> _savedLocations = [];
   
   // Функция для синхронизации города с другими провайдерами
   Function(String)? onCityChanged;
@@ -24,10 +25,12 @@ class WeatherProvider with ChangeNotifier {
   String get currentCity => _currentCity;
   bool get isLoading => _isLoading;
   String? get error => _error;
+  List<String> get savedLocations => _savedLocations;
   
   // Инициализация при старте
   WeatherProvider() {
     _initializeWithLocation();
+    _loadSavedLocations();
   }
 
   // Метод для инициализации с геолокацией
@@ -145,6 +148,35 @@ class WeatherProvider with ChangeNotifier {
   // Сброс ошибки
   void clearError() {
     _error = null;
+    notifyListeners();
+  }
+
+  // Загрузка сохраненных мест
+  Future<void> _loadSavedLocations() async {
+    final prefs = await SharedPreferences.getInstance();
+    _savedLocations = prefs.getStringList('savedLocations') ?? [];
+    notifyListeners();
+  }
+
+  // Сохранение мест
+  Future<void> _saveLocations() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('savedLocations', _savedLocations);
+  }
+
+  // Добавление места в список
+  Future<void> addLocation(String location) async {
+    if (!_savedLocations.contains(location)) {
+      _savedLocations.add(location);
+      await _saveLocations();
+      notifyListeners();
+    }
+  }
+
+  // Удаление места из списка
+  Future<void> removeLocation(String location) async {
+    _savedLocations.remove(location);
+    await _saveLocations();
     notifyListeners();
   }
 } 
