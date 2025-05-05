@@ -8,9 +8,10 @@ plugins {
 android {
     namespace = "com.example.proj_weather"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -39,6 +40,10 @@ android {
     }
 }
 
+dependencies {
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+}
 
 flutter {
     source = "../.."

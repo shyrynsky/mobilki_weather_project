@@ -8,9 +8,49 @@ import 'widgets/drawer_menu.dart';
 import 'providers/weather_provider.dart';
 import 'providers/ecology_provider.dart';
 import 'providers/settings_provider.dart';
+import 'package:workmanager/workmanager.dart';
+import 'services/notification_service.dart';
 
-void main() => runApp(const WeatherApp());
 
+@pragma('vm:entry-point')
+void callbackDispatcher() {
+  print('=== callbackDispatcher запущен ===');
+  Workmanager().executeTask((task, inputData) async {
+    print('=== executeTask: $task ===');
+    WidgetsFlutterBinding.ensureInitialized();
+    try {
+      await NotificationService.checkAndSendNotification();
+      print('=== checkAndSendNotification завершён ===');
+      return Future.value(true);
+    } catch (e, stack) {
+      print('=== ОШИБКА в callbackDispatcher: $e\\n$stack');
+      return Future.value(false);
+    }
+  });
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Добавить
+
+  // Инициализация уведомлений
+  await NotificationService.initialize();
+
+  // Инициализация Workmanager
+  await Workmanager().initialize(
+    callbackDispatcher,
+    isInDebugMode: true,
+  );
+  // Workmanager().registerOneOffTask(
+  //   "initTest",
+  //   "rain_notifications",
+  //   // frequency: Duration(days: 1),
+  //   initialDelay: Duration(seconds: 5),
+  //   // constraints: Constraints(networkType: NetworkType.connected),
+  //   // tag: 'rain_notifications'
+  // );
+
+  runApp(const WeatherApp());
+}
 class WeatherApp extends StatefulWidget {
   const WeatherApp({super.key});
 
@@ -24,6 +64,8 @@ class WeatherAppState extends State<WeatherApp> {
   // Создаем провайдеры заранее для установки связи между ними
   late final WeatherProvider _weatherProvider = WeatherProvider();
   late final EcologyProvider _ecologyProvider = EcologyProvider();
+  late final SettingsProvider _settingsProvider = SettingsProvider(); // Изменить
+
 
   void toggleTheme(bool value) {
     setState(() => _isDarkMode = value);
@@ -46,6 +88,8 @@ class WeatherAppState extends State<WeatherApp> {
     _ecologyProvider.onCityChanged = (city) {
       _weatherProvider.changeCity(city);
     };
+
+    _settingsProvider.loadSettings();
   }
 
   @override
@@ -54,7 +98,7 @@ class WeatherAppState extends State<WeatherApp> {
       providers: [
         ChangeNotifierProvider<WeatherProvider>.value(value: _weatherProvider),
         ChangeNotifierProvider<EcologyProvider>.value(value: _ecologyProvider),
-        ChangeNotifierProvider(create: (_) => SettingsProvider()),
+        ChangeNotifierProvider<SettingsProvider>.value(value: _settingsProvider), // Изменить
       ],
       child: MaterialApp(
         title: 'Погода+',
