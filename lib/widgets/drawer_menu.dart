@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../screens/units_settings_screen.dart';
+import '../screens/notification_settings_screen.dart';
+
 import '../main.dart';
 
 class DrawerMenu extends StatelessWidget {
@@ -30,6 +32,14 @@ class DrawerMenu extends StatelessWidget {
                 WeatherAppState.of(context)?.toggleTheme(result);
               }
             },
+          ),
+          ListTile(
+            leading: const Icon(Icons.notifications),
+            title: const Text("Уведомления"),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const NotificationSettingsScreen()),
+            ),
           ),
         ],
       ),
