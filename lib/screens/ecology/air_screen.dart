@@ -99,12 +99,15 @@ class AirContent extends StatelessWidget {
                             size: 32,
                           ),
                           const SizedBox(width: 8),
-                          Text(
-                            qualityText,
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: qualityColor,
+                          Expanded(
+                            child: Text(
+                              qualityText,
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: qualityColor,
+                              ),
+                              softWrap: true,
                             ),
                           ),
                         ],

@@ -74,13 +74,14 @@ class WeatherCard extends StatelessWidget {
               if (weather.conditionIcon.isNotEmpty)
                 CachedNetworkImage(
                   imageUrl: 'https:${weather.conditionIcon}',
-                  height: 64,
-                  width: 64,
+                  height: 120,
+                  width: 120,
+                  fit: BoxFit.contain,
                   placeholder: (context, url) => const CircularProgressIndicator(),
-                  errorWidget: (context, url, error) => const Icon(Icons.cloud, size: 64, color: Colors.blueGrey),
+                  errorWidget: (context, url, error) => const Icon(Icons.cloud, size: 120, color: Colors.blueGrey),
                 )
               else
-                const Icon(Icons.cloud, size: 64, color: Colors.blueGrey),
+                const Icon(Icons.cloud, size: 120, color: Colors.blueGrey),
               const SizedBox(height: 16),
               Text(
                 weather.condition,
