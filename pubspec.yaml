@@ -22,10 +22,6 @@ dependencies:
   timezone: ^0.10.1
   geolocator: ^10.1.0
   geocoding: ^2.1.1
-  #firebase_core: ^3.13.0
-  #firebase_auth: ^5.5.2
-  #cloud_firestore: ^5.6.6
-  #Не работают нихуя
 
 dev_dependencies:
   flutter_test:
