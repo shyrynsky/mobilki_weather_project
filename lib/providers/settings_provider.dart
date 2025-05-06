@@ -8,13 +8,11 @@ class SettingsProvider extends ChangeNotifier {
   bool _useCelsius = true;
   bool _notificationsEnabled = false;
 
-  // Новые параметры для уведомлений
   bool _notifyRainToday = true;
   bool _notifyRainTomorrow = false;
   TimeOfDay _notificationTimeToday = const TimeOfDay(hour: 8, minute: 0);
   TimeOfDay _notificationTimeTomorrow = const TimeOfDay(hour: 19, minute: 0);
 
-  // Геттеры
   bool get useCelsius => _useCelsius;
   bool get notificationsEnabled => _notificationsEnabled;
   bool get notifyRainToday => _notifyRainToday;
@@ -28,7 +26,6 @@ class SettingsProvider extends ChangeNotifier {
     _useCelsius = prefs.getBool('useCelsius') ?? true;
     _notificationsEnabled = prefs.getBool('notificationsEnabled') ?? false;
 
-    // Загрузка настроек уведомлений
     _notifyRainToday = prefs.getBool('notifyRainToday') ?? true;
     _notifyRainTomorrow = prefs.getBool('notifyRainTomorrow') ?? false;
 
@@ -96,17 +93,16 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
 
     if (_notificationsEnabled) {
-    if (notifyToday != null || timeToday != null) {
-      await Workmanager().cancelByUniqueName("today_rain_check");
+      if (notifyToday != null || timeToday != null) {
+        await Workmanager().cancelByUniqueName("today_rain_check");
+      }
+      if (notifyTomorrow != null || timeTomorrow != null) {
+        await Workmanager().cancelByUniqueName("tomorrow_rain_check");
+      }
+      await NotificationService.scheduleDailyCheck(this);
     }
-    if (notifyTomorrow != null || timeTomorrow != null) {
-      await Workmanager().cancelByUniqueName("tomorrow_rain_check");
-    }
-    await NotificationService.scheduleDailyCheck(this);
-  }
   }
 
-  // Остальные методы класса
   void setUseCelsius(bool value) {
     _useCelsius = value;
     _saveSettings();

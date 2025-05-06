@@ -50,7 +50,6 @@ class NotificationSettingsScreen extends StatelessWidget {
             },
           ),
 
-          // Настройки для сегодня
           _buildRainNotificationSection(
             context,
             'Уведомлять о дожде сегодня',
@@ -60,7 +59,6 @@ class NotificationSettingsScreen extends StatelessWidget {
                 (time) => settings.setNotificationSettings(timeToday: time),
           ),
 
-          // Настройки для завтра
           _buildRainNotificationSection(
             context,
             'Уведомлять о дожде завтра',

@@ -1,4 +1,3 @@
-// Модель для экологических данных
 class EcologyData {
   final AirQuality airQuality;
   final WaterQuality? waterQuality;
@@ -13,23 +12,21 @@ class EcologyData {
   factory EcologyData.fromJson(Map<String, dynamic> json) {
     return EcologyData(
       airQuality: AirQuality.fromJson(json),
-      // Для воды и радиации потребуются отдельные запросы или другие источники данных
       waterQuality: null,
       radiationData: null,
     );
   }
 }
 
-// Модель для качества воздуха (основана на данных из API weatherapi.com с полем aqi)
 class AirQuality {
-  final double co;          // Монооксид углерода (CO)
-  final double no2;         // Диоксид азота (NO2)
-  final double o3;          // Озон (O3)
-  final double so2;         // Диоксид серы (SO2)
-  final double pm2_5;       // Частицы PM2.5
-  final double pm10;        // Частицы PM10
-  final int usEpaIndex;     // Индекс EPA США (1-6)
-  final int gbDefraIndex;   // Индекс DEFRA (1-10)
+  final double co;
+  final double no2;
+  final double o3;
+  final double so2;
+  final double pm2_5;
+  final double pm10;
+  final int usEpaIndex;
+  final int gbDefraIndex;
 
   AirQuality({
     required this.co,
@@ -57,7 +54,6 @@ class AirQuality {
     );
   }
 
-  // Получение текстовой оценки качества воздуха по индексу EPA
   String getAirQualityText() {
     switch (usEpaIndex) {
       case 1:
@@ -77,28 +73,26 @@ class AirQuality {
     }
   }
 
-  // Получение цвета для индикации качества воздуха
   int getAirQualityColor() {
     switch (usEpaIndex) {
       case 1:
-        return 0xFF00E400; // Зеленый
+        return 0xFF00E400;
       case 2:
-        return 0xFFFFFF00; // Желтый
+        return 0xFFFFFF00;
       case 3:
-        return 0xFFFF7E00; // Оранжевый
+        return 0xFFFF7E00;
       case 4:
-        return 0xFFFF0000; // Красный
+        return 0xFFFF0000;
       case 5:
-        return 0xFF99004C; // Пурпурный
+        return 0xFF99004C;
       case 6:
-        return 0xFF7E0023; // Темно-красный
+        return 0xFF7E0023;
       default:
-        return 0xFF808080; // Серый
+        return 0xFF808080;
     }
   }
 }
 
-// Модель для качества воды (заготовка для будущего использования с реальным API)
 class WaterQuality {
   final double pH;
   final double dissolvedOxygen;
@@ -114,7 +108,7 @@ class WaterQuality {
     required this.conductivity,
   });
 
-  // В будущем можно будет добавить метод fromJson, когда будет доступен API для данных о качестве воды
+
   factory WaterQuality.mock() {
     return WaterQuality(
       pH: 7.2,
@@ -126,7 +120,6 @@ class WaterQuality {
   }
 
   String getWaterQualityText() {
-    // Примерная оценка качества воды на основе растворенного кислорода
     if (dissolvedOxygen > 8.0) return 'Отличное';
     if (dissolvedOxygen > 6.0) return 'Хорошее';
     if (dissolvedOxygen > 4.0) return 'Среднее';
@@ -135,9 +128,8 @@ class WaterQuality {
   }
 }
 
-// Модель для радиационных данных (заготовка для будущего использования с реальным API)
 class RadiationData {
-  final double backgroundLevel;  // мкЗв/ч
+  final double backgroundLevel;
   final String status;
 
   RadiationData({
@@ -145,7 +137,6 @@ class RadiationData {
     required this.status,
   });
 
-  // В будущем можно будет добавить метод fromJson, когда будет доступен API для радиационных данных
   factory RadiationData.mock() {
     return RadiationData(
       backgroundLevel: 0.12,

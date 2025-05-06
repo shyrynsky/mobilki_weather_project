@@ -7,8 +7,8 @@ import '../providers/weather_provider.dart';
 import '../services/weather_service.dart';
 
 enum MapMode {
-  viewInfo, // Просмотр информации о погоде
-  addLocation // Добавление города по карте
+  viewInfo,
+  addLocation
 }
 
 class MapScreen extends StatefulWidget {
@@ -24,12 +24,10 @@ class _MapScreenState extends State<MapScreen> {
   late MapMode _mode;
   String _selectedCity = "";
   final MapController _mapController = MapController();
-  
-  // Начальные координаты (Минск)
+
   LatLng _center = LatLng(53.9, 27.56);
   LatLng _markerPosition = LatLng(53.9, 27.56);
-  
-  // Дополнительная информация о выбранной локации
+
   String _locationInfo = "";
   bool _isSearching = false;
   
@@ -37,8 +35,7 @@ class _MapScreenState extends State<MapScreen> {
   void initState() {
     super.initState();
     _mode = widget.mode;
-    
-    // Если открыто из провайдера погоды, установить центр карты на текущий город
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final weatherProvider = Provider.of<WeatherProvider>(context, listen: false);
       _searchLocation(weatherProvider.currentCity, setCenter: true);
@@ -61,7 +58,6 @@ class _MapScreenState extends State<MapScreen> {
       body: Builder(
         builder: (context) => Stack(
           children: [
-            // Интерактивная карта
             FlutterMap(
               mapController: _mapController,
               options: MapOptions(
@@ -90,8 +86,7 @@ class _MapScreenState extends State<MapScreen> {
                 ),
               ],
             ),
-            
-            // Строка поиска
+
             Positioned(
               top: 10,
               left: 10,
@@ -127,8 +122,7 @@ class _MapScreenState extends State<MapScreen> {
                 ),
               ),
             ),
-            
-            // Информационная панель для режима добавления места
+
             if (_mode == MapMode.addLocation)
               Positioned(
                 bottom: 20,
@@ -187,8 +181,7 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ),
               ),
-              
-            // Инструкция для пользователя в режиме просмотра
+
             if (_mode == MapMode.viewInfo)
               Positioned(
                 bottom: 20,
@@ -243,8 +236,7 @@ class _MapScreenState extends State<MapScreen> {
       ),
     );
   }
-  
-  // Обработка нажатия на карту
+
   void _handleMapTap(BuildContext context, LatLng point) async {
     setState(() {
       _markerPosition = point;
@@ -252,15 +244,13 @@ class _MapScreenState extends State<MapScreen> {
     });
     
     try {
-      // Получаем информацию о месте по координатам
       final locationInfo = await _getLocationInfo(point);
       setState(() {
         _locationInfo = locationInfo.locationInfo;
         _selectedCity = locationInfo.cityName;
         _isSearching = false;
       });
-      
-      // Если мы в режиме просмотра, обновляем погоду по координатам и открываем правую панель
+
       if (_mode == MapMode.viewInfo) {
         final weatherProvider = Provider.of<WeatherProvider>(context, listen: false);
         await weatherProvider.fetchWeatherByCoordinates(point.latitude, point.longitude);
@@ -273,8 +263,7 @@ class _MapScreenState extends State<MapScreen> {
       });
     }
   }
-  
-  // Поиск места по названию
+
   Future<void> _searchLocation(String query, {bool setCenter = false}) async {
     if (query.isEmpty) return;
     
@@ -283,11 +272,8 @@ class _MapScreenState extends State<MapScreen> {
     });
     
     try {
-      // Здесь будет код для геокодирования (поиск координат по названию)
-      // Для демонстрации используем заглушку
       await Future.delayed(const Duration(seconds: 1));
-      
-      // Заглушка для разных городов
+
       LatLng location;
       switch (query.toLowerCase()) {
         case 'минск':
@@ -303,7 +289,6 @@ class _MapScreenState extends State<MapScreen> {
           location = LatLng(52.52, 13.4);
           break;
         default:
-          // Случайные координаты в Европе для демонстрации
           location = LatLng(
             50 + (DateTime.now().millisecond % 10),
             20 + (DateTime.now().second % 20),
@@ -329,11 +314,8 @@ class _MapScreenState extends State<MapScreen> {
       });
     }
   }
-  
-  // Центрирование на текущей локации пользователя
+
   void _centerOnCurrentLocation() {
-    // Здесь будет код для получения геолокации пользователя
-    // Для демонстрации просто устанавливаем координаты Минска
     final minsk = LatLng(53.9, 27.56);
     _mapController.move(minsk, 10);
     setState(() {
@@ -341,30 +323,23 @@ class _MapScreenState extends State<MapScreen> {
       _markerPosition = minsk;
     });
   }
-  
-  // Добавление выбранного города
+
   void _addSelectedCity(BuildContext context) async {
     if (_selectedCity.isNotEmpty) {
       final weatherProvider = Provider.of<WeatherProvider>(context, listen: false);
-      // Добавляем место в список сохраненных
       await weatherProvider.addLocation(_selectedCity);
-      // Устанавливаем как текущий город
       weatherProvider.changeCity(_selectedCity);
       Navigator.pop(context);
     }
   }
-  
-  // Получение информации о месте по координатам
+
   Future<LocationInfo> _getLocationInfo(LatLng point) async {
-    // Здесь будет код для обратного геокодирования (поиск названия по координатам)
-    // Для демонстрации используем заглушку
     await Future.delayed(const Duration(seconds: 1));
     
     final lat = point.latitude.toStringAsFixed(4);
     final lng = point.longitude.toStringAsFixed(4);
     String cityName;
-    
-    // Заглушка для определения города
+
     if ((point.latitude - 53.9).abs() < 1 && (point.longitude - 27.56).abs() < 1) {
       cityName = "Минск";
     } else if ((point.latitude - 55.75).abs() < 1 && (point.longitude - 37.62).abs() < 1) {
@@ -374,13 +349,11 @@ class _MapScreenState extends State<MapScreen> {
     } else if ((point.latitude - 52.52).abs() < 1 && (point.longitude - 13.4).abs() < 1) {
       cityName = "Берлин";
     } else {
-      // Используем API для получения названия города по координатам
       try {
         final weatherService = WeatherService();
         final location = await weatherService.getWeatherByCoordinates(point.latitude, point.longitude);
         cityName = location.cityName;
       } catch (e) {
-        // Если не удалось получить название города, используем координаты
         cityName = "Место ($lat, $lng)";
       }
     }
@@ -392,7 +365,6 @@ class _MapScreenState extends State<MapScreen> {
   }
 }
 
-// Вспомогательный класс для информации о местоположении
 class LocationInfo {
   final String cityName;
   final String locationInfo;

@@ -22,8 +22,6 @@ class Weather {
   });
 
   factory Weather.fromJson(Map<String, dynamic> json) {
-    // Предполагаем, что API возвращает данные в определенном формате
-    // Этот формат может потребоваться изменить в зависимости от выбранного API
     return Weather(
       cityName: json['location']['name'],
       temperature: json['current']['temp_c'],
@@ -36,8 +34,6 @@ class Weather {
     );
   }
 
-  // Создаем метод для получения замоканных данных 
-  // (будет использоваться при ошибках API или тестировании)
   factory Weather.mock() {
     return Weather(
       cityName: 'Минск',
@@ -51,13 +47,11 @@ class Weather {
     );
   }
 
-  // Вспомогательные методы для форматирования данных с учетом единиц измерения
   String getTemperatureString(SettingsProvider settings) {
     final convertedTemp = settings.convertTemperature(temperature);
     return '${convertedTemp.round()}${settings.temperatureUnit}';
   }
-  
-  // Старый метод для обратной совместимости
+
   String get temperatureString => '${temperature.round()}°C';
   
   String get humidityString => '$humidity%';
@@ -84,7 +78,6 @@ class Forecast {
   });
 
   factory Forecast.fromJson(Map<String, dynamic> json) {
-    // Парсим почасовой прогноз
     List<HourForecast> hourlyData = [];
     if (json['hour'] != null) {
       hourlyData = List<HourForecast>.from(
@@ -102,23 +95,19 @@ class Forecast {
     );
   }
 
-  // Метод с учетом настроек
   String getTempRangeString(SettingsProvider settings) {
     final minTempConverted = settings.convertTemperature(minTemp).round();
     final maxTempConverted = settings.convertTemperature(maxTemp).round();
     return '$minTempConverted${settings.temperatureUnit}-$maxTempConverted${settings.temperatureUnit}';
   }
-  
-  // Старый метод для обратной совместимости
+
   String get tempRangeString => '${minTemp.round()}°-${maxTemp.round()}°';
-  
-  // Получение прогноза для определенных часов (например, для 6-часового отображения)
+
   List<HourForecast> getPeriodicForecasts(List<int> hours) {
     return hourlyForecasts.where((hour) => hours.contains(hour.hour)).toList();
   }
 }
 
-// Новый класс для хранения почасового прогноза
 class HourForecast {
   final int hour;
   final String time;
@@ -141,7 +130,6 @@ class HourForecast {
   });
 
   factory HourForecast.fromJson(Map<String, dynamic> json) {
-    // Извлекаем час из строки времени (пример: "2023-07-26 09:00")
     final timeString = json['time'] as String;
     final hourString = timeString.split(' ')[1].split(':')[0];
     final hour = int.parse(hourString);
@@ -157,14 +145,12 @@ class HourForecast {
       chanceOfRain: json['chance_of_rain'].toDouble(),
     );
   }
-  
-  // Метод с учетом настроек
+
   String getTempString(SettingsProvider settings) {
     final convertedTemp = settings.convertTemperature(temp).round();
     return '$convertedTemp${settings.temperatureUnit}';
   }
 
-  // Старые методы для обратной совместимости
   String get tempString => '${temp.round()}°C';
   String get windString => '${windSpeed.round()} м/с';
   String get hourString => '$hour:00';

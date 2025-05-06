@@ -15,25 +15,21 @@ class WeatherProvider with ChangeNotifier {
   bool _isLoading = false;
   String? _error;
   List<String> _savedLocations = [];
-  
-  // Функция для синхронизации города с другими провайдерами
+
   Function(String)? onCityChanged;
-  
-  // Геттеры
+
   Weather? get currentWeather => _currentWeather;
   List<Forecast> get forecast => _forecast;
   String get currentCity => _currentCity;
   bool get isLoading => _isLoading;
   String? get error => _error;
   List<String> get savedLocations => _savedLocations;
-  
-  // Инициализация при старте
+
   WeatherProvider() {
     _initializeWithLocation();
     _loadSavedLocations();
   }
 
-  // Метод для инициализации с геолокацией
   Future<void> _initializeWithLocation() async {
     final hasPermission = await LocationService.checkLocationPermission();
     if (hasPermission) {
@@ -44,7 +40,6 @@ class WeatherProvider with ChangeNotifier {
         return;
       }
     }
-    // Если не удалось получить город по геолокации, используем сохраненный или дефолтный
     final prefs = await SharedPreferences.getInstance();
     final savedCity = prefs.getString('city');
     if (savedCity != null) {
@@ -52,8 +47,7 @@ class WeatherProvider with ChangeNotifier {
     }
     await fetchWeatherData(_currentCity);
   }
-  
-  // Метод для получения текущей погоды
+
   Future<void> fetchWeatherData(String city) async {
     _isLoading = true;
     _error = null;
@@ -86,7 +80,6 @@ class WeatherProvider with ChangeNotifier {
       notifyListeners();
     }
   }
-  // Метод для получения погоды по координатам
   Future<void> fetchWeatherByCoordinates(double lat, double lon) async {
     _isLoading = true;
     _error = null;
@@ -105,8 +98,7 @@ class WeatherProvider with ChangeNotifier {
       notifyListeners();
     }
   }
-  
-  // Метод для получения прогноза
+
   Future<void> fetchForecast(String city, {int days = 7}) async {
     _isLoading = true;
     _error = null;
@@ -117,54 +109,46 @@ class WeatherProvider with ChangeNotifier {
       _forecast = forecastData;
     } catch (e) {
       _error = e.toString();
-      // Оставляем предыдущий прогноз, если он есть
       print(_error);
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
-  
-  // Метод для обновления всех данных
+
   Future<void> refreshAllData() async {
     _error = null;
     await fetchWeatherData(_currentCity);
     await fetchForecast(_currentCity);
   }
-  
-  // Метод для изменения города
+
   void changeCity(String newCity) {
     if (newCity.isNotEmpty && newCity != _currentCity) {
       _currentCity = newCity;
       refreshAllData();
-      
-      // Уведомить других провайдеров об изменении города
+
       if (onCityChanged != null) {
         onCityChanged!(newCity);
       }
     }
   }
-  
-  // Сброс ошибки
+
   void clearError() {
     _error = null;
     notifyListeners();
   }
 
-  // Загрузка сохраненных мест
   Future<void> _loadSavedLocations() async {
     final prefs = await SharedPreferences.getInstance();
     _savedLocations = prefs.getStringList('savedLocations') ?? [];
     notifyListeners();
   }
 
-  // Сохранение мест
   Future<void> _saveLocations() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList('savedLocations', _savedLocations);
   }
 
-  // Добавление места в список
   Future<void> addLocation(String location) async {
     if (!_savedLocations.contains(location)) {
       _savedLocations.add(location);
@@ -173,7 +157,6 @@ class WeatherProvider with ChangeNotifier {
     }
   }
 
-  // Удаление места из списка
   Future<void> removeLocation(String location) async {
     _savedLocations.remove(location);
     await _saveLocations();

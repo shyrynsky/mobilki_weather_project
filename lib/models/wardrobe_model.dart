@@ -1,13 +1,12 @@
 class ClothingRecommendation {
-  final String clothingType; // "light", "medium", "warm", "very warm"
+  final String clothingType;
   final String description;
   final List<String> items;
   final bool needUmbrella;
-  final String iconPath; // Path to the icon representing the clothing type
-  
-  // Новые поля для разных периодов дня
-  final Map<String, DayPeriodRecommendation>? dayPeriods; // Опциональное поле для разных периодов дня
-  final bool hasDayPeriods; // Флаг указывающий, что рекомендации разделены по периодам дня
+  final String iconPath;
+
+  final Map<String, DayPeriodRecommendation>? dayPeriods;
+  final bool hasDayPeriods;
 
   ClothingRecommendation({
     required this.clothingType,
@@ -20,9 +19,8 @@ class ClothingRecommendation {
   });
 }
 
-// Новый класс для хранения рекомендаций по периодам дня
 class DayPeriodRecommendation {
-  final String period; // "morning", "afternoon", "evening"
+  final String period;
   final String clothingType;
   final String description;
   final List<String> items;
@@ -55,7 +53,7 @@ class TravelPlan {
 
 class TravelPackingList {
   final List<String> essentialItems;
-  final Map<String, int> clothingCounts; // Map of clothing item to count needed
+  final Map<String, int> clothingCounts;
   final bool needUmbrella;
   final String recommendation;
 

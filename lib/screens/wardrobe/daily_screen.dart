@@ -34,21 +34,18 @@ class _DailyWardrobeScreenState extends State<DailyWardrobeScreen> with SingleTi
     if (!_isInit) {
       final weatherProvider = Provider.of<WeatherProvider>(context, listen: false);
       final wardrobeProvider = Provider.of<WardrobeProvider>(context, listen: false);
-      
-      // Получаем рекомендацию для текущего города
+
       wardrobeProvider.getDailyRecommendation(weatherProvider.currentCity);
       _isInit = true;
     }
     super.didChangeDependencies();
   }
 
-  // Преобразуем строку с кодом иконки обратно в IconData
   IconData _getIconFromCode(String iconPath) {
     try {
       final iconCode = int.parse(iconPath);
       return IconData(iconCode, fontFamily: 'MaterialIcons');
     } catch (e) {
-      // По умолчанию, если произошла ошибка конвертации
       return Icons.checkroom;
     }
   }
@@ -78,7 +75,6 @@ class _DailyWardrobeScreenState extends State<DailyWardrobeScreen> with SingleTi
           );
         }
 
-        // Если рекомендации разделены по периодам дня, используем TabView
         if (recommendation.hasDayPeriods) {
           return Column(
             children: [
@@ -105,7 +101,6 @@ class _DailyWardrobeScreenState extends State<DailyWardrobeScreen> with SingleTi
           );
         }
 
-        // Иначе показываем обычный вид
         return SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -123,7 +118,6 @@ class _DailyWardrobeScreenState extends State<DailyWardrobeScreen> with SingleTi
     );
   }
 
-  // Построение информации о текущей погоде
   Widget _buildCurrentWeatherInfo(BuildContext context) {
     return Consumer<WeatherProvider>(
       builder: (context, weatherProvider, _) {
@@ -165,7 +159,6 @@ class _DailyWardrobeScreenState extends State<DailyWardrobeScreen> with SingleTi
     );
   }
 
-  // Построение основной рекомендации
   Widget _buildMainRecommendation(ClothingRecommendation recommendation) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
@@ -180,15 +173,13 @@ class _DailyWardrobeScreenState extends State<DailyWardrobeScreen> with SingleTi
     );
   }
 
-  // Построение рекомендации для конкретного периода дня
   Widget _buildPeriodRecommendation(ClothingRecommendation recommendation, String periodKey) {
     final periodMap = {
       'morning': 'Утро',
       'afternoon': 'День',
       'evening': 'Вечер',
     };
-    
-    // Проверяем, что у нас есть данные для этого периода
+
     if (!recommendation.hasDayPeriods || recommendation.dayPeriods == null || 
         !recommendation.dayPeriods!.containsKey(periodKey)) {
       return Center(

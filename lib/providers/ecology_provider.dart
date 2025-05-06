@@ -10,22 +10,18 @@ class EcologyProvider with ChangeNotifier {
   String _currentCity = AppConstants.defaultCity;
   bool _isLoading = false;
   String? _error;
-  
-  // Функция для синхронизации города с другими провайдерами
+
   Function(String)? onCityChanged;
-  
-  // Геттеры
+
   EcologyData? get ecologyData => _ecologyData;
   String get currentCity => _currentCity;
   bool get isLoading => _isLoading;
   String? get error => _error;
-  
-  // Инициализация при старте
+
   EcologyProvider() {
     fetchEcologyData(_currentCity);
   }
-  
-  // Метод для получения экологических данных
+
   Future<void> fetchEcologyData(String city) async {
     _isLoading = true;
     _error = null;
@@ -44,8 +40,7 @@ class EcologyProvider with ChangeNotifier {
       notifyListeners();
     }
   }
-  
-  // Метод для получения данных о качестве воды
+
   Future<void> fetchWaterQuality(String city) async {
     _isLoading = true;
     notifyListeners();
@@ -67,8 +62,7 @@ class EcologyProvider with ChangeNotifier {
       notifyListeners();
     }
   }
-  
-  // Метод для получения данных о радиации
+
   Future<void> fetchRadiationData(String city) async {
     _isLoading = true;
     notifyListeners();
@@ -90,29 +84,25 @@ class EcologyProvider with ChangeNotifier {
       notifyListeners();
     }
   }
-  
-  // Метод для обновления всех экологических данных
+
   Future<void> refreshAllData() async {
     _error = null;
     await fetchEcologyData(_currentCity);
     await fetchWaterQuality(_currentCity);
     await fetchRadiationData(_currentCity);
   }
-  
-  // Метод для изменения города
+
   void changeCity(String newCity) {
     if (newCity.isNotEmpty && newCity != _currentCity) {
       _currentCity = newCity;
       refreshAllData();
-      
-      // Уведомить других провайдеров об изменении города
+
       if (onCityChanged != null) {
         onCityChanged!(newCity);
       }
     }
   }
-  
-  // Сброс ошибки
+
   void clearError() {
     _error = null;
     notifyListeners();

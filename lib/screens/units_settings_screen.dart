@@ -17,7 +17,6 @@ class _UnitsSettingsScreenState extends State<UnitsSettingsScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize dark mode value from the app's theme
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final brightness = Theme.of(context).brightness;
       setState(() {
@@ -82,7 +81,6 @@ class _UnitsSettingsScreenState extends State<UnitsSettingsScreen> {
               setState(() {
                 _isDarkMode = value;
               });
-              // Use the public accessor method to update theme
               WeatherAppState.of(context)?.toggleTheme(value);
             },
           ),

@@ -14,15 +14,13 @@ class WardrobeProvider with ChangeNotifier {
   TravelPackingList? _packingList;
   String? _error;
   bool _isLoading = false;
-  
-  // Геттеры
+
   ClothingRecommendation? get currentRecommendation => _currentRecommendation;
   List<TravelPlan> get travelPlans => _travelPlans;
   TravelPackingList? get packingList => _packingList;
   String? get error => _error;
   bool get isLoading => _isLoading;
-  
-  // Получить рекомендацию по одежде для текущей погоды с учетом прогноза на день
+
   Future<void> getDailyRecommendation(String city) async {
     _isLoading = true;
     _error = null;

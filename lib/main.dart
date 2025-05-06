@@ -32,12 +32,10 @@ void callbackDispatcher() {
 }
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Добавить
+  WidgetsFlutterBinding.ensureInitialized();
 
-  // Инициализация уведомлений
   await NotificationService.initialize();
 
-  // Инициализация Workmanager
   await Workmanager().initialize(
     callbackDispatcher,
     isInDebugMode: false,
@@ -54,8 +52,7 @@ class WeatherApp extends StatefulWidget {
 
 class WeatherAppState extends State<WeatherApp> {
   bool _isDarkMode = false;
-  
-  // Создаем провайдеры заранее для установки связи между ними
+
   late final WeatherProvider _weatherProvider = WeatherProvider();
   late final EcologyProvider _ecologyProvider = EcologyProvider();
   late final SettingsProvider _settingsProvider = SettingsProvider(); // Изменить
@@ -65,7 +62,6 @@ class WeatherAppState extends State<WeatherApp> {
     setState(() => _isDarkMode = value);
   }
 
-  // Add a public accessor method
   static WeatherAppState? of(BuildContext context) {
     return context.findAncestorStateOfType<WeatherAppState>();
   }
@@ -73,12 +69,12 @@ class WeatherAppState extends State<WeatherApp> {
   @override
   void initState() {
     super.initState();
-    // Устанавливаем связь между провайдерами для синхронизации города
+
     _weatherProvider.onCityChanged = (city) {
       _ecologyProvider.changeCity(city);
     };
     
-    // Двусторонняя синхронизация
+
     _ecologyProvider.onCityChanged = (city) {
       _weatherProvider.changeCity(city);
     };
@@ -94,7 +90,7 @@ class WeatherAppState extends State<WeatherApp> {
         ChangeNotifierProvider<EcologyProvider>.value(value: _ecologyProvider),
         ChangeNotifierProvider(create: (_) => SettingsProvider()),
         ChangeNotifierProvider(create: (_) => WardrobeProvider()),
-        ChangeNotifierProvider<SettingsProvider>.value(value: _settingsProvider), // Изменить
+        ChangeNotifierProvider<SettingsProvider>.value(value: _settingsProvider),
       ],
       child: MaterialApp(
         title: 'Погода+',

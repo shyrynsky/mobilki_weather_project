@@ -18,8 +18,7 @@ class HomeScreen extends StatelessWidget {
           final weather = weatherProvider.currentWeather;
           final isLoading = weatherProvider.isLoading;
           final error = weatherProvider.error;
-          
-          // Показываем ошибку через ErrorHandler, если полностью нет данных
+
           if (error != null && weather == null) {
             return ErrorHandler.buildFullScreenError(
               error,

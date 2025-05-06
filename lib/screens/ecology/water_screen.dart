@@ -19,8 +19,7 @@ class WaterScreen extends StatelessWidget {
         if (isLoading) {
           return const Center(child: CircularProgressIndicator());
         }
-        
-        // Показываем ошибку через ErrorHandler
+
         if (error != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             ErrorHandler.showError(context, error);
@@ -29,7 +28,6 @@ class WaterScreen extends StatelessWidget {
         }
         
         if (waterQuality == null) {
-          // Если нет данных о воде, но есть данные о воздухе, загрузим данные о воде
           if (ecologyData != null) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               ecologyProvider.fetchWaterQuality(ecologyProvider.currentCity);
@@ -56,10 +54,8 @@ class WaterScreen extends StatelessWidget {
           );
         }
 
-        // Получаем текстовую оценку
         final qualityText = waterQuality.getWaterQualityText();
-        
-        // Определяем цвет статуса
+
         Color statusColor;
         if (waterQuality.dissolvedOxygen > 8.0) {
           statusColor = Colors.green;
@@ -92,8 +88,7 @@ class WaterScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 12),
-              
-              // Карточка с общей оценкой качества воды
+
               Card(
                 elevation: 3,
                 child: Padding(
@@ -130,8 +125,7 @@ class WaterScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              
-              // Подробные данные о качестве воды
+
               const Text(
                 "Подробные данные",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),

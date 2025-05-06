@@ -27,8 +27,7 @@ class AirContent extends StatelessWidget {
         if (isLoading) {
           return const Center(child: CircularProgressIndicator());
         }
-        
-        // Показываем ошибку через ErrorHandler
+
         if (error != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             ErrorHandler.showError(context, error);
@@ -56,8 +55,7 @@ class AirContent extends StatelessWidget {
             ),
           );
         }
-        
-        // Получаем данные о качестве воздуха
+
         final airQuality = ecologyData.airQuality;
         final qualityText = airQuality.getAirQualityText();
         final qualityColor = Color(airQuality.getAirQualityColor());
@@ -81,8 +79,7 @@ class AirContent extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 12),
-              
-              // Карточка с общей оценкой качества воздуха
+
               Card(
                 elevation: 3,
                 child: Padding(
@@ -120,8 +117,7 @@ class AirContent extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              
-              // Подробные данные о загрязнителях
+
               const Text(
                 "Подробные данные",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),

@@ -6,16 +6,13 @@ import 'dart:convert';
 class LocationService {
   static Future<String?> getCurrentCity() async {
     try {
-      // Запрашиваем разрешение на доступ к геолокации
       final status = await Permission.location.request();
       
       if (status.isGranted) {
-        // Получаем текущую позицию
         final position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high,
         );
 
-        // Используем OSM Nominatim API для получения адреса
         final response = await http.get(Uri.parse(
           'https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.latitude}&lon=${position.longitude}&accept-language=ru'
         ));

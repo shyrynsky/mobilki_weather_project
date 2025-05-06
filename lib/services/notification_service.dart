@@ -25,14 +25,7 @@ class NotificationService {
   }
 
   static Future<void> scheduleDailyCheck(SettingsProvider settings) async {
-    // await Workmanager().cancelByTag('rain_notifications');
-    // await Workmanager().cancelByUniqueName("today_rain_check");
-    //
-    // await Workmanager().cancelByUniqueName("tomorrow_rain_check");
-
-
-
-    final tasks = [
+     final tasks = [
       if (settings.notifyRainToday)
         _createTask(
           settings.notificationTimeToday,
@@ -95,7 +88,6 @@ class NotificationService {
         final forecast = await _weatherService.getForecast(city, days: forecastDays);
         print('Прогноз получен');
 
-        // Проверка на сегодня
         if (settings.notifyRainToday) {
           final todayForecast = forecast.first;
           final rainPeriods = _getRainPeriods(todayForecast.hourlyForecasts);
@@ -106,7 +98,6 @@ class NotificationService {
           }
         }
 
-        // Проверка на завтра
         if (settings.notifyRainTomorrow && forecast.length > 1) {
           final tomorrowForecast = forecast[1];
           final rainPeriods = _getRainPeriods(tomorrowForecast.hourlyForecasts);

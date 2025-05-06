@@ -16,11 +16,9 @@ class TravelWardrobeScreen extends StatefulWidget {
 class _TravelWardrobeScreenState extends State<TravelWardrobeScreen> with SingleTickerProviderStateMixin {
   final TextEditingController _cityController = TextEditingController();
   late TabController _tabController;
-  
-  // Режим выбора диапазона дат
+
   bool _isRangeDateMode = false;
-  
-  // Даты начала и конца диапазона
+
   DateTime _startDate = DateTime.now().add(const Duration(days: 1));
   DateTime _endDate = DateTime.now().add(const Duration(days: 1));
 
@@ -37,7 +35,6 @@ class _TravelWardrobeScreenState extends State<TravelWardrobeScreen> with Single
     super.dispose();
   }
 
-  // Выбор начальной даты диапазона
   Future<void> _selectStartDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -49,21 +46,19 @@ class _TravelWardrobeScreenState extends State<TravelWardrobeScreen> with Single
     if (picked != null) {
       setState(() {
         _startDate = picked;
-        
-        // Если конечная дата раньше начальной, корректируем конечную дату
+
         if (_endDate.isBefore(_startDate)) {
           _endDate = _startDate;
         }
       });
     }
   }
-  
-  // Выбор конечной даты диапазона
+
   Future<void> _selectEndDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: _endDate.isAfter(_startDate) ? _endDate : _startDate,
-      firstDate: _startDate, // Конечная дата не может быть раньше начальной
+      firstDate: _startDate,
       lastDate: DateTime.now().add(const Duration(days: 90)),
     );
     
@@ -73,27 +68,21 @@ class _TravelWardrobeScreenState extends State<TravelWardrobeScreen> with Single
       });
     }
   }
-  
-  // Получение списка дат в диапазоне
+
   List<DateTime> _getDatesInRange() {
     List<DateTime> dates = [];
-    
-    // Если не режим диапазона, возвращаем только начальную дату
+
     if (!_isRangeDateMode) {
-      // Создаем копию даты с только необходимыми полями (без времени)
       return [DateTime(_startDate.year, _startDate.month, _startDate.day)];
     }
-    
-    // Генерируем все даты в диапазоне
+
     DateTime current = DateTime(_startDate.year, _startDate.month, _startDate.day);
     final end = DateTime(_endDate.year, _endDate.month, _endDate.day);
-    
-    // Убедимся, что даты идут в правильном порядке
+
     if (current.isAfter(end)) {
-      return [current]; // Если что-то не так, возвращаем только начальную дату
+      return [current];
     }
-    
-    // Добавляем все даты в диапазоне
+
     while (!current.isAfter(end)) {
       dates.add(current);
       current = current.add(const Duration(days: 1));
@@ -102,7 +91,6 @@ class _TravelWardrobeScreenState extends State<TravelWardrobeScreen> with Single
     return dates;
   }
 
-  // Добавление плана путешествия для диапазона дат
   void _addTravelPlan() async {
     if (_cityController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -112,43 +100,35 @@ class _TravelWardrobeScreenState extends State<TravelWardrobeScreen> with Single
     }
 
     final wardrobeProvider = Provider.of<WardrobeProvider>(context, listen: false);
-    
-    // Получаем все даты в выбранном диапазоне
+
     final datesInRange = _getDatesInRange();
-    
-    // Проверяем, что у нас есть хотя бы одна дата
+
     if (datesInRange.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Выберите хотя бы одну дату')),
       );
       return;
     }
-    
-    // Показываем индикатор загрузки и сохраняем текущий режим для сброса после завершения
+
     bool wasRangeMode = _isRangeDateMode;
     setState(() => _isRangeDateMode = false);
     
     if (datesInRange.length == 1) {
-      // Если это одиночная дата, используем простой метод
       await wardrobeProvider.addCityToTravelPlan(_cityController.text, datesInRange[0]);
     } else {
-      // Иначе используем оптимизированный метод для диапазона
       await wardrobeProvider.addCityToTravelPlanForDateRange(_cityController.text, datesInRange);
     }
     
     if (wardrobeProvider.error == null) {
       _cityController.clear();
-      // Сбрасываем к начальному состоянию
       setState(() {
         _startDate = DateTime.now().add(const Duration(days: 1));
         _endDate = DateTime.now().add(const Duration(days: 1));
-        _isRangeDateMode = false; // Всегда сбрасываем режим диапазона после успешного добавления
+        _isRangeDateMode = false;
       });
-      
-      // Переключаемся на список городов после добавления
+
       _tabController.animateTo(1);
     } else {
-      // В случае ошибки восстанавливаем предыдущий режим
       setState(() {
         _isRangeDateMode = wasRangeMode;
       });
@@ -181,8 +161,7 @@ class _TravelWardrobeScreenState extends State<TravelWardrobeScreen> with Single
 
   Widget _buildAddCityTab() {
     final wardrobeProvider = Provider.of<WardrobeProvider>(context);
-    
-    // Вычисляем количество дней в диапазоне
+
     final datesInRange = _getDatesInRange();
     final int daysCount = datesInRange.length;
     
@@ -210,8 +189,7 @@ class _TravelWardrobeScreenState extends State<TravelWardrobeScreen> with Single
             ),
           ),
           const SizedBox(height: 16),
-          
-          // Переключатель режима выбора дат
+
           Row(
             children: [
               Checkbox(
@@ -225,8 +203,7 @@ class _TravelWardrobeScreenState extends State<TravelWardrobeScreen> with Single
               const Text('Выбрать диапазон дат'),
             ],
           ),
-          
-          // Показываем либо одну дату, либо диапазон дат
+
           if (!_isRangeDateMode) ...[
             const SizedBox(height: 8),
             InkWell(
@@ -294,7 +271,6 @@ class _TravelWardrobeScreenState extends State<TravelWardrobeScreen> with Single
               ],
             ),
             const SizedBox(height: 12),
-            // Показываем количество дней и список дат
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(12),
@@ -366,8 +342,7 @@ class _TravelWardrobeScreenState extends State<TravelWardrobeScreen> with Single
         child: Text('Добавьте города в план путешествия'),
       );
     }
-    
-    // Группируем планы по городам
+
     final Map<String, List<TravelPlan>> groupedPlans = {};
     for (var plan in travelPlans) {
       if (!groupedPlans.containsKey(plan.cityName)) {
@@ -382,11 +357,9 @@ class _TravelWardrobeScreenState extends State<TravelWardrobeScreen> with Single
         itemBuilder: (ctx, i) {
           final cityName = groupedPlans.keys.elementAt(i);
           final cityPlans = groupedPlans[cityName]!;
-          
-          // Сортируем планы по дате
+
           cityPlans.sort((a, b) => a.date.compareTo(b.date));
-          
-          // Проверяем, являются ли даты последовательными (непрерывный диапазон)
+
           bool isConsecutive = true;
           for (int j = 0; j < cityPlans.length - 1; j++) {
             final difference = cityPlans[j + 1].date.difference(cityPlans[j].date).inDays;
@@ -395,8 +368,7 @@ class _TravelWardrobeScreenState extends State<TravelWardrobeScreen> with Single
               break;
             }
           }
-          
-          // Формируем подзаголовок в зависимости от непрерывности диапазона
+
           String subtitleText;
           if (isConsecutive && cityPlans.length > 1) {
             subtitleText = '${cityPlans.length} дней: ${DateFormat('dd.MM').format(cityPlans.first.date)} - ${DateFormat('dd.MM').format(cityPlans.last.date)}';
